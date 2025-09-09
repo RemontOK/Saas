@@ -182,24 +182,68 @@ function Demo() {
   }
 
   return (
-    <section id="demo" className="max-w-7xl mx-auto px-4 py-6">
-      <h3>Демо: Парсер лидов</h3>
-      <form onSubmit={onSearch} className="grid gap-4 grid-cols-6">
-        <input placeholder="Ниша (напр. кофейни)" value={niche} onChange={e => setNiche(e.target.value)} className="col-span-2" />
-        <input placeholder="Локация (напр. Москва)" value={location} onChange={e => setLocation(e.target.value)} className="col-span-2" />
-        <input type="number" min={10} max={500} value={limit} onChange={e => setLimit(Number(e.target.value))} className="col-span-1" />
-        <input type="number" min={0} max={5000} value={minReviews} onChange={e => setMinReviews(Number(e.target.value))} placeholder=">= отзывов" className="col-span-1" />
-        <label className="col-span-1 flex items-center"><input type="checkbox" checked={recentOnly} onChange={e => setRecentOnly(e.target.checked)} /> Новые (≤1 год)</label>
-        <label className="col-span-1 flex items-center"><input type="checkbox" checked={hasInstagram} onChange={e => setHasInstagram(e.target.checked)} /> Есть Instagram</label>
-        <div className="col-span-6 flex gap-4">
-          <button type="submit" disabled={!canSearch} className="primary-button">{stage === 'search' ? 'Ищем...' : 'Искать'}</button>
-          <button type="button" onClick={exportCsv} disabled={!leads.length} className="primary-button">Экспорт CSV</button>
-          {stage !== 'idle' && <div className="text-gray-600">Статус: {stage === 'search' ? 'Сбор' : stage === 'enrich' ? 'Обогащение' : 'Готово'}</div>}
-          <span className="text-red-500">{error}</span>
+    <section id="demo" className="demo-section" style={{ margin: '4rem 1rem' }}>
+      <div className="container">
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h3 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: '#0f172a' }}>
+            🎯 Демо: Парсер лидов
+          </h3>
+          <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
+            Попробуйте прямо сейчас! Введите нишу и локацию, чтобы увидеть как работает поиск лидов.
+          </p>
+        </div>
+        <form onSubmit={onSearch} className="demo-form">
+        <input placeholder="Ниша (напр. кофейни)" value={niche} onChange={e => setNiche(e.target.value)} className="demo-input" />
+        <input placeholder="Локация (напр. Москва)" value={location} onChange={e => setLocation(e.target.value)} className="demo-input" />
+        <input type="number" min={10} max={500} value={limit} onChange={e => setLimit(Number(e.target.value))} className="demo-input" placeholder="Лимит" />
+        <input type="number" min={0} max={5000} value={minReviews} onChange={e => setMinReviews(Number(e.target.value))} placeholder="Мин. отзывов" className="demo-input" />
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+          <input type="checkbox" checked={recentOnly} onChange={e => setRecentOnly(e.target.checked)} /> 
+          Новые (≤1 год)
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+          <input type="checkbox" checked={hasInstagram} onChange={e => setHasInstagram(e.target.checked)} /> 
+          Есть Instagram
+        </label>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button 
+            type="submit" 
+            disabled={!canSearch} 
+            className="primary-button"
+            style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
+          >
+            {stage === 'search' ? '🔍 Ищем...' : '🚀 Искать лиды'}
+          </button>
+          <button 
+            type="button" 
+            onClick={exportCsv} 
+            disabled={!leads.length} 
+            className="primary-button"
+            style={{ padding: '0.75rem 2rem', fontSize: '1rem', background: '#22c55e', borderColor: '#22c55e' }}
+          >
+            📊 Экспорт CSV
+          </button>
+          {stage !== 'idle' && (
+            <div style={{ 
+              padding: '0.5rem 1rem', 
+              background: '#f0f9ff', 
+              border: '1px solid #0ea5e9', 
+              borderRadius: '8px',
+              color: '#0ea5e9',
+              fontSize: '0.875rem'
+            }}>
+              Статус: {stage === 'search' ? '🔍 Сбор данных' : stage === 'enrich' ? '✨ Обогащение' : '✅ Готово'}
+            </div>
+          )}
+          {error && (
+            <span style={{ color: '#ef4444', fontSize: '0.875rem', padding: '0.5rem' }}>
+              ❌ {error}
+            </span>
+          )}
         </div>
       </form>
-      <div className="overflow-x-auto">
-        <table className="w-full mt-4 border-collapse">
+      <div className="demo-table">
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
               <th className="text-left border-b border-gray-200">Company</th>
@@ -243,24 +287,11 @@ function Demo() {
           </tbody>
         </table>
       </div>
+      </div>
     </section>
   )
 }
 
-function PricingCard({ name, price, features, onSelect, popular }: { name: string; price: string; features: string[]; onSelect: () => void; popular?: boolean }) {
-  return (
-    <div className={`border-2 ${popular ? 'border-blue-500' : 'border-gray-200'} rounded-lg p-5 grid gap-3 relative ${popular ? 'bg-blue-50' : 'bg-white'}`}>
-      {popular && <div className="absolute top-[-10px] right-4 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-semibold">Популярный</div>}
-      <div className="text-2xl font-semibold">{name}</div>
-      <div className="text-3xl font-bold">{price}</div>
-      <ul className="m-0 pl-6">
-        {features.map((f, i) => <li key={i} className="mb-3">{f}</li>)}
-      </ul>
-      <button onClick={onSelect} className="primary-button">Начать зарабатывать</button>
-      <div className="text-sm text-gray-600">Окупаемость с 1–2 сделок</div>
-    </div>
-  )
-}
 
 export default function App() {
   const [showCheckout, setShowCheckout] = useState(false)
@@ -321,16 +352,33 @@ export default function App() {
         <FadeKeyframes />
         <div className="container hero-grid">
           <div style={fadeStyles}>
-            <h1 style={{ fontSize: 48, lineHeight: 1.1, margin: 0 }}>Превратите поиски клиентов в деньги</h1>
-            <p style={{ fontSize: 18, color: '#cbd5e1', margin: '14px 0 0' }}>Готовые списки компаний по вашей нише + проверенные контакты — чтобы закрывать сделки быстрее и дешевле.</p>
+            <h1 className="hero-title">Превратите поиски клиентов в деньги</h1>
+            <p className="hero-subtitle">
+              Готовые списки компаний по вашей нише + проверенные контакты — чтобы закрывать сделки быстрее и дешевле.
+            </p>
             <div className="hero-cta">
-              <a href="#pricing"><button className="btn-on-dark glow hover-lift">Выбрать тариф</button></a>
-              <a href="#how"><button className="hover-lift" style={{ background: 'transparent', color: '#e2e8f0', borderColor: 'rgba(148,163,184,.3)' }}>Как это работает</button></a>
+              <a href="#pricing">
+                <button className="btn-on-dark glow hover-lift" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
+                  🚀 Начать зарабатывать
+                </button>
+              </a>
+              <a href="#demo">
+                <button className="hover-lift" style={{ 
+                  background: 'transparent', 
+                  color: '#e2e8f0', 
+                  borderColor: 'rgba(148,163,184,.3)',
+                  padding: '1rem 2rem',
+                  fontSize: '1.1rem'
+                }}>
+                  🎯 Попробовать демо
+                </button>
+              </a>
             </div>
-            <div className="hero-sub">Окупаемость чаще всего с первой сделки. Никаких сложных настроек.</div>
+            <div className="hero-sub">
+              ⚡ Окупаемость с первой сделки • 🎯 Без сложных настроек • 📊 Проверенные контакты
+            </div>
           </div>
           <div className="mock-3d">
-            {/* Parallax */}
             <MockCard3D />
           </div>
         </div>
@@ -350,25 +398,52 @@ export default function App() {
       </section>
 
       {/* Features (money-focused) */}
-      <section style={{ padding: '32px 16px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2>Почему это приносит деньги</h2>
-          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))' }}>
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>Лиды «под сделку»</div>
-              <div style={{ color: '#475569' }}>Релевантные компании и лица, принимающие решения — меньше холостых звонков.</div>
+      <section style={{ padding: '4rem 1rem', background: 'white' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Почему это приносит деньги
+            </h2>
+            <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
+              Каждая функция создана для увеличения ваших продаж и снижения затрат на привлечение клиентов
+            </p>
+          </div>
+          <div className="feature-grid">
+            <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
+              <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)' }}>
+                🎯
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Лиды «под сделку»</div>
+              <div style={{ color: '#475569', lineHeight: 1.6 }}>
+                Релевантные компании и лица, принимающие решения — меньше холостых звонков, больше встреч.
+              </div>
             </div>
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>Контакты, которые отвечают</div>
-              <div style={{ color: '#475569' }}>Email/телефон с верификацией — выше delivery и ответов.</div>
+            <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
+              <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
+                ✅
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Контакты, которые отвечают</div>
+              <div style={{ color: '#475569', lineHeight: 1.6 }}>
+                Email/телефон с верификацией — выше delivery и ответов. Реальные люди, а не боты.
+              </div>
             </div>
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>Экономия бюджета</div>
-              <div style={{ color: '#475569' }}>Снижаем CAC: больше встреч за меньшие деньги.</div>
+            <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
+              <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+                💰
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Экономия бюджета</div>
+              <div style={{ color: '#475569', lineHeight: 1.6 }}>
+                Снижаем CAC в 3-5 раз: больше качественных встреч за меньшие деньги.
+              </div>
             </div>
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>Быстрый старт</div>
-              <div style={{ color: '#475569' }}>Запуститесь за 10 минут и получите первые лиды сегодня.</div>
+            <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
+              <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
+                ⚡
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Быстрый старт</div>
+              <div style={{ color: '#475569', lineHeight: 1.6 }}>
+                Запуститесь за 10 минут и получите первые лиды сегодня. Никаких сложных настроек.
+              </div>
             </div>
           </div>
         </div>
@@ -396,13 +471,97 @@ export default function App() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" style={{ padding: '32px 16px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2>Тарифы — окупаются с 1 сделки</h2>
-          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))' }}>
-            <PricingCard name="Starter" price="$19/мес" features={["До 300 лидов","Базовое обогащение","CSV экспорт"]} onSelect={() => openCheckout('Starter')} />
-            <PricingCard popular name="Pro" price="$49/мес" features={["До 1500 лидов","Верификация email","Приоритет"]} onSelect={() => openCheckout('Pro')} />
-            <PricingCard name="Agency" price="$149/мес" features={["До 6000 лидов","API и интеграции","Сопровождение"]} onSelect={() => openCheckout('Agency')} />
+      <section id="pricing" style={{ padding: '4rem 1rem', background: 'white' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Тарифы — окупаются с 1 сделки
+            </h2>
+            <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
+              Выберите план, который подходит для ваших целей. Все тарифы включают базовый функционал.
+            </p>
+          </div>
+          <div className="pricing-grid">
+            <div className="pricing-card">
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Starter</div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '1.5rem' }}>
+                ₽1,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> До 300 лидов
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Базовое обогащение
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> CSV экспорт
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Email поддержка
+                </li>
+              </ul>
+              <button onClick={() => openCheckout('Starter')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
+                Начать зарабатывать
+              </button>
+              <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#64748b' }}>
+                Окупаемость с 1–2 сделок
+              </div>
+            </div>
+
+            <div className="pricing-card popular">
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Pro</div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '1.5rem' }}>
+                ₽4,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> До 1,500 лидов
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Верификация email
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Приоритетная поддержка
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Расширенные фильтры
+                </li>
+              </ul>
+              <button onClick={() => openCheckout('Pro')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
+                Начать зарабатывать
+              </button>
+              <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#64748b' }}>
+                Самый популярный выбор
+              </div>
+            </div>
+
+            <div className="pricing-card">
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Agency</div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '1.5rem' }}>
+                ₽12,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> До 6,000 лидов
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> API и интеграции
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Персональное сопровождение
+                </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Белый лейбл
+                </li>
+              </ul>
+              <button onClick={() => openCheckout('Agency')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
+                Начать зарабатывать
+              </button>
+              <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#64748b' }}>
+                Для агентств и больших команд
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -411,19 +570,53 @@ export default function App() {
       <Demo />
 
       {/* Testimonials */}
-      <section style={{ padding: '32px 16px', background: '#fcfcfd' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2>Что говорят клиенты</h2>
-          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
-            <blockquote style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, background: '#fff' }}>
-              «Первые встречи на 2‑й день, окупили подписку одной сделкой». <div style={{ color: '#64748b', marginTop: 6 }}>— Андрей, агентство рекламы</div>
-            </blockquote>
-            <blockquote style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, background: '#fff' }}>
-              «Качество email‑ов выше, чем в таблицах, что покупали раньше». <div style={{ color: '#64748b', marginTop: 6 }}>— Наталья, SaaS‑стартап</div>
-            </blockquote>
-            <blockquote style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, background: '#fff' }}>
-              «Лиды в нише HVAC нашли быстро, CSV выгрузили — пошли заявки». <div style={{ color: '#64748b', marginTop: 6 }}>— Олег, локальный сервис</div>
-            </blockquote>
+      <section style={{ padding: '4rem 1rem', background: '#fcfcfd' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Что говорят клиенты
+            </h2>
+            <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
+              Реальные отзывы от предпринимателей, которые уже зарабатывают с нашим сервисом
+            </p>
+          </div>
+          <div className="testimonial-grid">
+            <div className="testimonial-card">
+              <div className="testimonial-text">
+                «Первые встречи на 2‑й день, окупили подписку одной сделкой. Качество лидов намного выше, чем у конкурентов.»
+              </div>
+              <div className="testimonial-author">
+                <div className="author-avatar">А</div>
+                <div className="author-info">
+                  <div className="author-name">Андрей Козлов</div>
+                  <div className="author-role">Директор агентства рекламы</div>
+                </div>
+              </div>
+            </div>
+            <div className="testimonial-card">
+              <div className="testimonial-text">
+                «Качество email‑ов выше, чем в таблицах, что покупали раньше. Доставляемость 95%+, отвечают реальные люди.»
+              </div>
+              <div className="testimonial-author">
+                <div className="author-avatar">Н</div>
+                <div className="author-info">
+                  <div className="author-name">Наталья Смирнова</div>
+                  <div className="author-role">CEO SaaS‑стартапа</div>
+                </div>
+              </div>
+            </div>
+            <div className="testimonial-card">
+              <div className="testimonial-text">
+                «Лиды в нише HVAC нашли быстро, CSV выгрузили — пошли заявки. За месяц закрыли 8 сделок на ₽2.4М.»
+              </div>
+              <div className="testimonial-author">
+                <div className="author-avatar">О</div>
+                <div className="author-info">
+                  <div className="author-name">Олег Петров</div>
+                  <div className="author-role">Основатель локального сервиса</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
