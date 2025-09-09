@@ -70,24 +70,24 @@ const FadeKeyframes = () => (
   .glow { box-shadow: 0 0 0 6px rgba(14,165,233,.08) }
   
   @keyframes scroll-left { 
-    0% { transform: translateX(100vw) } 
-    100% { transform: translateX(-100%) } 
+    0% { transform: translateX(0%) } 
+    100% { transform: translateX(-33.33%) } 
   }
   @keyframes scroll-right { 
-    0% { transform: translateX(-100%) } 
-    100% { transform: translateX(100vw) } 
+    0% { transform: translateX(-33.33%) } 
+    100% { transform: translateX(0%) } 
   }
   
   .testimonial-scroll-left { 
-    animation: scroll-left 25s linear infinite;
+    animation: scroll-left 40s linear infinite;
   }
   .testimonial-scroll-right { 
-    animation: scroll-right 30s linear infinite;
+    animation: scroll-right 45s linear infinite;
   }
   `}</style>
 )
 
-// Компонент для текущих отзывов
+// Компонент для бесконечно текущих отзывов
 function FlowingTestimonials() {
   const shuffledTestimonials = useMemo(() => {
     return [...TESTIMONIALS].sort(() => Math.random() - 0.5);
@@ -95,6 +95,10 @@ function FlowingTestimonials() {
 
   const firstRow = shuffledTestimonials.slice(0, 5);
   const secondRow = shuffledTestimonials.slice(5, 10);
+
+  // Дублируем отзывы для бесконечной прокрутки
+  const infiniteFirstRow = [...firstRow, ...firstRow, ...firstRow];
+  const infiniteSecondRow = [...secondRow, ...secondRow, ...secondRow];
 
   return (
     <div style={{ overflow: 'hidden', position: 'relative' }}>
@@ -106,7 +110,7 @@ function FlowingTestimonials() {
         whiteSpace: 'nowrap'
       }}>
         <div className="testimonial-scroll-left" style={{ display: 'flex', gap: '1rem' }}>
-          {firstRow.map((testimonial, index) => (
+          {infiniteFirstRow.map((testimonial, index) => (
             <div
               key={`row1-${index}`}
               style={{
@@ -116,7 +120,8 @@ function FlowingTestimonials() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '16px',
                 padding: '1.5rem',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.3s ease'
               }}
             >
               <div style={{ 
@@ -165,7 +170,7 @@ function FlowingTestimonials() {
         whiteSpace: 'nowrap'
       }}>
         <div className="testimonial-scroll-right" style={{ display: 'flex', gap: '1rem' }}>
-          {secondRow.map((testimonial, index) => (
+          {infiniteSecondRow.map((testimonial, index) => (
             <div
               key={`row2-${index}`}
               style={{
@@ -175,7 +180,8 @@ function FlowingTestimonials() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '16px',
                 padding: '1.5rem',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.3s ease'
               }}
             >
               <div style={{ 
