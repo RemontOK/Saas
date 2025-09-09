@@ -23,12 +23,20 @@
 html, body, #root { height: 100%; }
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden; /* Убираем горизонтальный скролл */
 }
 body {
   margin: 0;
   min-width: 320px;
   background: var(--bg);
   color: var(--text);
+  overflow-x: hidden; /* Убираем горизонтальный скролл */
+}
+
+/* Предотвращаем overflow на всех элементах */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 h1, h2, h3 { margin: 0 0 8px; }

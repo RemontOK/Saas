@@ -312,6 +312,12 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @media (max-width: 768px) {
+  /* Убираем горизонтальный скролл */
+  body, html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
   .desktop-nav {
     display: none;
   }
@@ -332,10 +338,12 @@ input[type="range"]::-moz-range-thumb {
   
   .hero-title {
     font-size: 2rem !important;
+    word-wrap: break-word;
   }
   
   .hero-subtitle {
     font-size: 1.1rem !important;
+    word-wrap: break-word;
   }
   
   .hero-cta {
@@ -354,16 +362,20 @@ input[type="range"]::-moz-range-thumb {
   
   .mock-3d {
     order: -1;
+    overflow: hidden;
   }
   
   .mock-card {
     width: 100% !important;
-    max-width: 400px;
-    height: 240px !important;
+    max-width: 350px;
+    height: 200px !important;
+    margin: 0 auto;
   }
   
   .container {
     padding: 0 1rem !important;
+    max-width: 100% !important;
+    overflow-x: hidden;
   }
   
   .demo-form {
@@ -375,22 +387,51 @@ input[type="range"]::-moz-range-thumb {
   .demo-input {
     width: 100% !important;
     box-sizing: border-box !important;
+    max-width: 100% !important;
   }
   
   /* Адаптивная демо секция */
   .demo-section {
     padding: 2rem 1rem !important;
+    overflow-x: hidden !important;
   }
   
   /* Адаптивная таблица */
   .demo-table {
     overflow-x: auto !important;
     font-size: 0.875rem !important;
+    width: 100% !important;
+    display: block;
+    white-space: nowrap;
   }
   
   .demo-table th,
   .demo-table td {
     padding: 0.5rem !important;
-    min-width: 120px;
+    min-width: 100px;
+    word-wrap: break-word;
+  }
+  
+  /* Исправляем все секции */
+  section {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
+  /* Исправляем длинные тексты */
+  p, h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  /* Отключаем анимации отзывов на мобильных */
+  .testimonial-scroll-left,
+  .testimonial-scroll-right {
+    animation: none !important;
+  }
+  
+  /* Скрываем переполнение в секции отзывов */
+  section[style*="overflow: hidden"] {
+    overflow: hidden !important;
   }
 }
