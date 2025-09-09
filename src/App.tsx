@@ -581,9 +581,9 @@ function Demo() {
           border: '1px solid #e5e7eb'
         }}>
           {/* Основные поля */}
-          <div style={{ 
+          <div className="demo-form" style={{ 
             display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
             gap: '1.5rem',
             marginBottom: '1.5rem'
           }}>
@@ -1175,6 +1175,7 @@ export default function App() {
   const [sending, setSending] = useState(false)
   const [done, setDone] = useState<string>('')
   const [err, setErr] = useState<string>('')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const openCheckout = (p: string) => { setPlan(p); setShowCheckout(true) }
 
@@ -1208,17 +1209,250 @@ export default function App() {
 
   return (
     <div>
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 header-dark">
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 0' }}>
-          <a href="#" className="nav-link" style={{ fontWeight: 800, fontSize: 18, color: '#e5e7eb' }}>Contacto</a>
-          <nav style={{ display: 'flex', gap: 8 }}>
-            <a href="#how" className="nav-link" style={{ color: '#e5e7eb' }}>Как работает</a>
-            <a href="#pricing" className="nav-link" style={{ color: '#e5e7eb' }}>Тарифы</a>
-            <a href="#demo" className="nav-link" style={{ color: '#e5e7eb' }}>Демо</a>
+      {/* Adaptive Header */}
+      <header style={{ 
+        position: 'sticky', 
+        top: 0, 
+        zIndex: 50,
+        background: 'linear-gradient(90deg, rgba(9, 9, 11, 0.95), rgba(2, 6, 23, 0.95))',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(148,163,184,.08)'
+      }}>
+        <div style={{ 
+          maxWidth: '1100px', 
+          margin: '0 auto', 
+          padding: '0 16px',
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          minHeight: '60px'
+        }}>
+          {/* Logo */}
+          <a href="#" style={{ 
+            fontWeight: 800, 
+            fontSize: '1.25rem', 
+            textDecoration: 'none',
+            background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent'
+          }}>
+            Contacto
+          </a>
+
+          {/* Desktop Navigation */}
+          <nav className="desktop-nav" style={{ 
+            gap: '2rem'
+          }}>
+            <a href="#how" style={{ 
+              color: '#e5e7eb', 
+              textDecoration: 'none',
+              transition: 'color 0.3s ease',
+              fontSize: '0.95rem'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#0ea5e9'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#e5e7eb'}>
+              Как работает
+            </a>
+            <a href="#pricing" style={{ 
+              color: '#e5e7eb', 
+              textDecoration: 'none',
+              transition: 'color 0.3s ease',
+              fontSize: '0.95rem'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#0ea5e9'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#e5e7eb'}>
+              Тарифы
+            </a>
+            <a href="#demo" style={{ 
+              color: '#e5e7eb', 
+              textDecoration: 'none',
+              transition: 'color 0.3s ease',
+              fontSize: '0.95rem'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#0ea5e9'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#e5e7eb'}>
+              Демо
+            </a>
           </nav>
-          <a href="#pricing"><button className="btn-on-dark hover-lift">Начать зарабатывать</button></a>
+
+          {/* Desktop CTA Button */}
+          <div className="desktop-cta">
+            <a href="#pricing">
+              <button style={{
+                background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                color: 'white',
+                border: 'none',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '12px',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                Начать зарабатывать
+              </button>
+            </a>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '44px',
+              height: '44px',
+              background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2))',
+              border: '1px solid rgba(14, 165, 233, 0.3)',
+              borderRadius: '8px',
+              color: '#0ea5e9',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #0ea5e9, #6366f1)';
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.transform = 'scale(1.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2))';
+              e.currentTarget.style.color = '#0ea5e9';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {mobileMenuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div style={{
+            background: 'rgba(9, 9, 11, 0.98)',
+            backdropFilter: 'blur(10px)',
+            borderTop: '1px solid rgba(148,163,184,.08)',
+            padding: '1rem'
+          }}>
+            <nav style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '1rem'
+            }}>
+              <a 
+                href="#how" 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: '#e5e7eb', 
+                  textDecoration: 'none',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  fontSize: '1rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.1)';
+                  e.currentTarget.style.color = '#0ea5e9';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#e5e7eb';
+                }}
+              >
+                🚀 Как работает
+              </a>
+              <a 
+                href="#pricing" 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: '#e5e7eb', 
+                  textDecoration: 'none',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  fontSize: '1rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.1)';
+                  e.currentTarget.style.color = '#0ea5e9';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#e5e7eb';
+                }}
+              >
+                💰 Тарифы
+              </a>
+              <a 
+                href="#demo" 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: '#e5e7eb', 
+                  textDecoration: 'none',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  fontSize: '1rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.1)';
+                  e.currentTarget.style.color = '#0ea5e9';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#e5e7eb';
+                }}
+              >
+                🎯 Демо
+              </a>
+              
+              {/* Mobile CTA Button */}
+              <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>
+                <button style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '1rem',
+                  borderRadius: '12px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginTop: '0.5rem',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}>
+                  🚀 Начать зарабатывать
+                </button>
+              </a>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero */}

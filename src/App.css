@@ -297,3 +297,100 @@ input[type="range"]::-moz-range-thumb {
   border: none;
   box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
 }
+
+/* Mobile Responsive Styles */
+.desktop-nav {
+  display: flex;
+}
+
+.mobile-menu-btn {
+  display: none;
+}
+
+.desktop-cta {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: flex;
+  }
+  
+  .desktop-cta {
+    display: none;
+  }
+  
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem !important;
+  }
+  
+  .hero-cta {
+    justify-content: center !important;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .mock-3d {
+    order: -1;
+  }
+  
+  .mock-card {
+    width: 100% !important;
+    max-width: 400px;
+    height: 240px !important;
+  }
+  
+  .container {
+    padding: 0 1rem !important;
+  }
+  
+  .demo-form {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  /* Исправляем overflow в автокомплите */
+  .demo-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Адаптивная демо секция */
+  .demo-section {
+    padding: 2rem 1rem !important;
+  }
+  
+  /* Адаптивная таблица */
+  .demo-table {
+    overflow-x: auto !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .demo-table th,
+  .demo-table td {
+    padding: 0.5rem !important;
+    min-width: 120px;
+  }
+}
