@@ -1168,6 +1168,7 @@ function Demo() {
 
 
 export default function App() {
+  console.log('App component loaded successfully!');
   const [showCheckout, setShowCheckout] = useState(false)
   const [plan, setPlan] = useState<string>('Starter')
   const [email, setEmail] = useState('')
