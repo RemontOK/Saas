@@ -479,3 +479,93 @@ input[type="range"]::-moz-range-thumb {
     overflow-x: hidden !important;
   }
 }
+
+/* Скрытие ползунка для форм авторизации */
+.auth-form-container {
+  /* Скрываем ползунок для WebKit браузеров (Chrome, Safari, Edge) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE и Edge */
+}
+
+.auth-form-container::-webkit-scrollbar {
+  display: none; /* WebKit браузеры */
+}
+
+/* Адаптивность для форм авторизации */
+@media (max-width: 768px) {
+  /* Мобильные стили для форм */
+  .auth-form-container {
+    padding: 1rem !important;
+    margin: 0.5rem !important;
+    max-height: 95vh !important;
+  }
+  
+  .auth-form-header {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    text-align: center !important;
+  }
+  
+  .auth-form-title {
+    font-size: 1.5rem !important;
+  }
+  
+  .auth-form-button {
+    width: 100% !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  .auth-form-fields {
+    gap: 1rem !important;
+  }
+  
+  .auth-form-field {
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Адаптивность для header */
+@media (max-width: 768px) {
+  /* Скрываем десктопную навигацию на мобильных */
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  /* Скрываем десктопные CTA кнопки на мобильных */
+  .desktop-cta {
+    display: none !important;
+  }
+  
+  /* Показываем мобильную кнопку меню */
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  
+  /* Адаптируем контейнер header */
+  .header-container {
+    padding: 0 1rem !important;
+    min-height: 56px !important;
+  }
+  
+  /* Уменьшаем размер логотипа на мобильных */
+  .header-logo {
+    font-size: 1.1rem !important;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Скрываем мобильную кнопку меню на десктопе */
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  
+  /* Показываем десктопную навигацию */
+  .desktop-nav {
+    display: flex !important;
+  }
+  
+  /* Показываем десктопные CTA кнопки */
+  .desktop-cta {
+    display: flex !important;
+  }
+}

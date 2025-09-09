@@ -1,5 +1,8 @@
 import { useMemo, useState } from 'react'
 import './App.css'
+import Register from './pages/Register'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 
 // Популярные ниши для автокомплита
 const POPULAR_NICHES = [
@@ -1111,6 +1114,18 @@ function Demo() {
 
 export default function App() {
   const [showCheckout, setShowCheckout] = useState(false)
+  const [showRegister, setShowRegister] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // Проверяем localStorage при загрузке
+    const savedUser = localStorage.getItem('user')
+    return !!savedUser
+  })
+  const [user, setUser] = useState<{name: string, email: string, plan: string} | null>(() => {
+    // Загружаем данные пользователя из localStorage
+    const savedUser = localStorage.getItem('user')
+    return savedUser ? JSON.parse(savedUser) : null
+  })
   const [plan, setPlan] = useState<string>('Starter')
   const [email, setEmail] = useState('')
   const [notes, setNotes] = useState('')
@@ -1119,7 +1134,41 @@ export default function App() {
   const [err, setErr] = useState<string>('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const openCheckout = (p: string) => { setPlan(p); setShowCheckout(true) }
+  const openCheckout = (p: string) => { 
+    setPlan(p); 
+    setShowRegister(true) 
+  }
+  
+  const openLogin = () => {
+    setShowLogin(true);
+  }
+  
+  const switchToLogin = () => {
+    setShowRegister(false);
+    setShowLogin(true);
+  }
+  
+  const switchToRegister = () => {
+    setShowLogin(false);
+    setShowRegister(true);
+  }
+  
+  const handleAuthSuccess = (userData: {name: string, email: string, plan: string}) => {
+    setUser(userData)
+    setIsLoggedIn(true)
+    setShowRegister(false)
+    setShowLogin(false)
+    // Сохраняем данные в localStorage
+    localStorage.setItem('user', JSON.stringify(userData))
+  }
+  
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    setUser(null)
+    // Удаляем данные из localStorage
+    localStorage.removeItem('user')
+  }
+  
 
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -1149,6 +1198,15 @@ export default function App() {
     }
   }
 
+  // Если пользователь авторизован, показываем Dashboard
+  if (isLoggedIn && user) {
+    return (
+      <div className="App">
+        <Dashboard user={user} onLogout={handleLogout} />
+      </div>
+    )
+  }
+
   return (
     <div>
       {/* Adaptive Header */}
@@ -1160,7 +1218,7 @@ export default function App() {
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid rgba(148,163,184,.08)'
       }}>
-        <div style={{ 
+        <div className="header-container" style={{ 
           maxWidth: '1100px', 
           margin: '0 auto', 
           padding: '0 16px',
@@ -1170,7 +1228,7 @@ export default function App() {
           minHeight: '60px'
         }}>
           {/* Logo */}
-          <a href="#" style={{ 
+          <a href="#" className="header-logo" style={{ 
             fontWeight: 800, 
             fontSize: '1.25rem', 
             textDecoration: 'none',
@@ -1184,6 +1242,7 @@ export default function App() {
 
           {/* Desktop Navigation */}
           <nav className="desktop-nav" style={{ 
+            display: 'flex',
             gap: '2rem'
           }}>
             <a href="#how" style={{ 
@@ -1218,8 +1277,69 @@ export default function App() {
             </a>
           </nav>
 
-          {/* Desktop CTA Button */}
-          <div className="desktop-cta">
+          {/* Desktop CTA Buttons */}
+          <div className="desktop-cta" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            {isLoggedIn ? (
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1rem',
+                color: '#e5e7eb'
+              }}>
+                <span style={{ fontSize: '0.9rem' }}>
+                  👋 Привет, {user?.name}!
+                </span>
+                <button 
+                  onClick={handleLogout}
+                  style={{
+                    background: 'transparent',
+                    color: '#ef4444',
+                    border: '2px solid #ef4444',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#ef4444';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#ef4444';
+                  }}
+                >
+                  Выйти
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={openLogin}
+                style={{
+                  background: 'transparent',
+                  color: '#e5e7eb',
+                  border: '2px solid #e5e7eb',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.color = '#0f172a';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#e5e7eb';
+                }}
+              >
+                Войти
+              </button>
+            )}
             <a href="#pricing">
               <button style={{
                 background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
@@ -2180,6 +2300,71 @@ export default function App() {
               {err && <div style={{ color: 'crimson' }}>{err}</div>}
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Register Page */}
+      {showRegister && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+          <Register 
+            selectedPlan={plan} 
+            onSuccess={handleAuthSuccess}
+            onSwitchToLogin={switchToLogin}
+          />
+          <button 
+            onClick={() => setShowRegister(false)}
+            style={{
+              position: 'absolute',
+              top: '2rem',
+              right: '2rem',
+              background: 'rgba(255, 255, 255, 0.9)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '3rem',
+              height: '3rem',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              zIndex: 10000
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Login Page */}
+      {showLogin && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+          <Login 
+            onSuccess={handleAuthSuccess}
+            onSwitchToRegister={switchToRegister}
+          />
+          <button 
+            onClick={() => setShowLogin(false)}
+            style={{
+              position: 'absolute',
+              top: '2rem',
+              right: '2rem',
+              background: 'rgba(255, 255, 255, 0.9)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '3rem',
+              height: '3rem',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              zIndex: 10000
+            }}
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>
