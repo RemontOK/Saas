@@ -1726,10 +1726,265 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: '24px 16px', color: '#475569' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div>© {new Date().getFullYear()} Parcer</div>
-          <a href="#pricing">Тарифы</a>
+      <footer style={{ 
+        background: 'linear-gradient(135deg, #0f172a, #1e293b)', 
+        color: '#e2e8f0', 
+        padding: '4rem 1rem 2rem',
+        marginTop: '4rem'
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          {/* Main Footer Content */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: '3rem', 
+            marginBottom: '3rem' 
+          }}>
+            
+            {/* Company Info */}
+            <div>
+              <h3 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: '800', 
+                marginBottom: '1rem',
+                background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent'
+              }}>
+                Contacto
+              </h3>
+              <p style={{ 
+                color: '#94a3b8', 
+                marginBottom: '1.5rem', 
+                lineHeight: '1.6' 
+              }}>
+                Находим контакты лиц, принимающих решения. Больше встреч, меньше холостых звонков.
+              </p>
+              
+              {/* Social Links */}
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                {[
+                  { icon: '📧', href: 'mailto:hello@contacto.ru', label: 'Email' },
+                  { icon: '💬', href: 'https://t.me/contacto_support', label: 'Telegram' },
+                  { icon: '🐦', href: 'https://twitter.com/contacto', label: 'Twitter' },
+                  { icon: '💼', href: 'https://linkedin.com/company/contacto', label: 'LinkedIn' }
+                ].map((social, index) => (
+                  <a 
+                    key={index}
+                    href={social.href} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ 
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '40px',
+                      height: '40px',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '50%',
+                      color: '#e2e8f0',
+                      textDecoration: 'none',
+                      fontSize: '1.2rem',
+                      transition: 'all 0.3s ease',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #0ea5e9, #6366f1)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                    title={social.label}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 style={{ 
+                fontSize: '1.1rem', 
+                fontWeight: '600', 
+                marginBottom: '1.5rem',
+                color: '#f1f5f9'
+              }}>
+                Быстрые ссылки
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {[
+                  { text: 'Как работает', href: '#how' },
+                  { text: 'Тарифы', href: '#pricing' },
+                  { text: 'Демо', href: '#demo' },
+                  { text: 'API документация', href: '#api' },
+                  { text: 'Поддержка', href: '#support' }
+                ].map((link, index) => (
+                  <a 
+                    key={index}
+                    href={link.href} 
+                    style={{ 
+                      color: '#94a3b8', 
+                      textDecoration: 'none',
+                      transition: 'color 0.3s ease',
+                      fontSize: '0.95rem'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#0ea5e9'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                  >
+                    {link.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h4 style={{ 
+                fontSize: '1.1rem', 
+                fontWeight: '600', 
+                marginBottom: '1.5rem',
+                color: '#f1f5f9'
+              }}>
+                Контакты
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.2rem' }}>📍</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.95rem' }}>
+                    Москва, Россия
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.2rem' }}>📧</span>
+                  <a 
+                    href="mailto:hello@contacto.ru" 
+                    style={{ 
+                      color: '#94a3b8', 
+                      textDecoration: 'none',
+                      fontSize: '0.95rem'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#0ea5e9'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                  >
+                    hello@contacto.ru
+                  </a>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.2rem' }}>⏰</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.95rem' }}>
+                    Пн-Пт 9:00-18:00 МСК
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <h4 style={{ 
+                fontSize: '1.1rem', 
+                fontWeight: '600', 
+                marginBottom: '1.5rem',
+                color: '#f1f5f9'
+              }}>
+                Будьте в курсе
+              </h4>
+              <p style={{ 
+                color: '#94a3b8', 
+                marginBottom: '1rem', 
+                fontSize: '0.9rem',
+                lineHeight: '1.5'
+              }}>
+                Подпишитесь на обновления и получайте советы по поиску клиентов
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input 
+                  type="email" 
+                  placeholder="Ваш email"
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '8px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#e2e8f0',
+                    fontSize: '0.9rem'
+                  }}
+                />
+                <button
+                  style={{
+                    padding: '0.75rem 1rem',
+                    background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  📧
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div style={{ 
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)', 
+            paddingTop: '2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem'
+          }}>
+            <div style={{ 
+              color: '#64748b', 
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <span>© {new Date().getFullYear()} Contacto.</span>
+              <span>Сделано с ❤️ в России</span>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+              {[
+                'Политика конфиденциальности',
+                'Условия использования', 
+                'Cookies'
+              ].map((link, index) => (
+                <a 
+                  key={index}
+                  href={`#${link.toLowerCase().replace(/\s+/g, '-')}`}
+                  style={{ 
+                    color: '#64748b', 
+                    textDecoration: 'none',
+                    fontSize: '0.9rem',
+                    transition: 'color 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#94a3b8'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                >
+                  {link}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </footer>
 
