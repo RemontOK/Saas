@@ -20,6 +20,31 @@ const POPULAR_CITIES = [
   'Хабаровск', 'Махачкала', 'Томск', 'Оренбург', 'Кемерово'
 ];
 
+// Реалистичные названия компаний по нишам
+const COMPANY_TEMPLATES = {
+  'кофейни': ['Кофейня "Утро"', 'Coffee Point', 'Зерно & Молоко', 'Эспрессо Бар', 'Кофе Хауз', 'Бодрое утро', 'Кофейная станция', 'Арабика', 'Робуста кофе', 'Кафе "Зёрнышко"'],
+  'стоматологии': ['Стоматология "Белоснежка"', 'Дент Престиж', 'Семейная стоматология', 'Клиника "Улыбка"', 'Дентал Центр', 'Стома Плюс', 'Здоровые зубы', 'Дент Лайф', 'Стоматология "Жемчуг"', 'Дент Мастер'],
+  'автосервисы': ['АвтоТехЦентр', 'Мастер Моторс', 'СТО "Профи"', 'АвтоДоктор', 'Техцентр "Движение"', 'АвтоЭксперт', 'Сервис Авто', 'АвтоМастерская', 'Техстанция', 'АвтоРемонт Плюс'],
+  'салоны красоты': ['Салон "Шарм"', 'Beauty Studio', 'Стиль & Красота', 'Салон "Элегант"', 'Бьюти Центр', 'Салон "Афродита"', 'Красота & SPA', 'Студия красоты', 'Салон "Грация"', 'Beauty Point'],
+  'рестораны': ['Ресторан "Тройка"', 'Бистро "Вкус"', 'Ресторан "Усадьба"', 'Кафе "Домашний"', 'Ресторан "Московский"', 'Бистро "Европа"', 'Кафе "Уютный дворик"', 'Ресторан "Традиция"', 'Гастробар', 'Кафе "Встреча"']
+};
+
+// Реалистичные домены
+const DOMAIN_ENDINGS = ['.ru', '.moscow', '.spb.ru', '.com', '.рф'];
+const DOMAIN_PREFIXES = ['', 'www.', 'clinic-', 'salon-', 'auto-', 'cafe-', 'restaurant-'];
+
+// Российские телефонные коды
+const PHONE_CODES = ['495', '812', '383', '343', '843', '831', '351', '846', '3812', '863'];
+
+// Телеграм каналы по нишам  
+const TELEGRAM_TEMPLATES = {
+  'кофейни': ['@coffee_morning', '@espresso_bar', '@kofeyna_utro'],
+  'стоматологии': ['@dent_prestige', '@smile_clinic', '@dental_center'],
+  'автосервисы': ['@auto_master', '@sto_profi', '@avto_doctor'],
+  'салоны красоты': ['@salon_charm', '@beauty_studio', '@salon_elegant'],
+  'рестораны': ['@restaurant_troyka', '@bistro_vkus', '@cafe_home']
+};
+
 // helper fade css
 const fadeStyles: React.CSSProperties = { animation: 'fadeUp .6s ease both' }
 
@@ -201,10 +226,10 @@ function Demo() {
     setError('')
     setStage('search')
     try {
-      // Проверяем, работает ли API сервер
-      const isProduction = window.location.hostname.includes('github.io')
+      // Используем mock данные для демо (и локально, и на GitHub Pages)
+      const useMockData = true; // Всегда используем mock данные для демо
       
-      if (isProduction) {
+      if (useMockData) {
         // Mock данные для GitHub Pages
         await new Promise(resolve => setTimeout(resolve, 1000)) // имитация задержки
         const max = Math.min(Number(limit) || 20, 100)
@@ -213,20 +238,51 @@ function Demo() {
         const items = Array.from({ length: max }).map((_, i) => {
           const reviews = Math.floor(Math.random() * 500)
           const rating = (Math.random() * 2 + 3).toFixed(1) // 3.0 - 5.0
-          const telegram = Math.random() > 0.6 ? `@company_${i + 1}` : ''
-          const whatsapp = Math.random() > 0.4 ? `+7-999-${String(i + 1).padStart(3, '0')}-${String(Math.floor(Math.random() * 100)).padStart(2, '0')}-${String(Math.floor(Math.random() * 100)).padStart(2, '0')}` : ''
           const openedAt = now - Math.floor(Math.random() * 400) * 24 * 3600 * 1000 // дни назад
-          const domain = `example-${i + 1}.com`
+          
+          // Определяем нишу для реалистичных названий
+          const nicheKey = niche.toLowerCase().includes('кофе') ? 'кофейни' :
+                          niche.toLowerCase().includes('стомат') ? 'стоматологии' :
+                          niche.toLowerCase().includes('авто') ? 'автосервисы' :
+                          niche.toLowerCase().includes('красот') ? 'салоны красоты' :
+                          niche.toLowerCase().includes('ресторан') ? 'рестораны' : 'кофейни';
+          
+          // Реалистичные названия компаний
+          const companyTemplates = COMPANY_TEMPLATES[nicheKey] || COMPANY_TEMPLATES['кофейни'];
+          const companyName = companyTemplates[i % companyTemplates.length] || `${niche} "${['Премиум', 'Элит', 'Профи', 'Мастер', 'Эксперт'][i % 5]}"`;
+          
+          // Реалистичные домены
+          const domainBase = companyName.toLowerCase()
+            .replace(/[^а-яё\w\s]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/[ёъьйю]/g, (m) => ({'ё':'e','ъ':'','ь':'','й':'y','ю':'yu'}[m] || m));
+          const domainEnding = DOMAIN_ENDINGS[Math.floor(Math.random() * DOMAIN_ENDINGS.length)];
+          const domainPrefix = DOMAIN_PREFIXES[Math.floor(Math.random() * DOMAIN_PREFIXES.length)];
+          const domain = `${domainPrefix}${domainBase}${domainEnding}`;
+          
+          // Российские телефоны
+          const phoneCode = PHONE_CODES[Math.floor(Math.random() * PHONE_CODES.length)];
+          const phoneNum = `${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 90) + 10}-${Math.floor(Math.random() * 90) + 10}`;
+          const phone = `+7 (${phoneCode}) ${phoneNum}`;
+          
+          // WhatsApp (российские номера)
+          const whatsapp = Math.random() > 0.6 ? `+7-999-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 90) + 10}-${Math.floor(Math.random() * 90) + 10}` : '';
+          
+          // Телеграм каналы
+          const telegramTemplates = TELEGRAM_TEMPLATES[nicheKey] || TELEGRAM_TEMPLATES['кофейни'];
+          const telegram = Math.random() > 0.5 ? telegramTemplates[Math.floor(Math.random() * telegramTemplates.length)] : '';
+          
+          // Email качество
           const quality = Math.random()
           const tag = quality > 0.7 ? 'verified' : quality > 0.35 ? 'guessed' : 'unknown'
           
           return {
             id: i + 1,
-            company: `${niche} Company ${i + 1}`,
+            company: companyName,
             location: location || 'Москва',
             website: `https://${domain}`,
-            email: (tag === 'unknown') ? '' : `info@${domain}`,
-            phone: '+1-555-0100',
+            email: (tag === 'unknown') ? '' : `info@${domain.replace(/^www\./, '')}`,
+            phone: phone,
             rating: Number(rating),
             reviews,
             telegram: telegram,
@@ -648,58 +704,207 @@ function Demo() {
             )}
         </div>
       </form>
-      <div className="demo-table">
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="demo-table" style={{ marginTop: '2rem' }}>
+        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
           <thead>
-            <tr>
-              <th className="text-left border-b border-gray-200">Компания</th>
-              <th className="text-left border-b border-gray-200">Город</th>
-              <th className="text-left border-b border-gray-200">Сайт</th>
-              <th className="text-left border-b border-gray-200">Email</th>
-              <th className="text-left border-b border-gray-200">Телефон</th>
-              <th className="text-left border-b border-gray-200">Телеграм</th>
-              <th className="text-left border-b border-gray-200">WhatsApp</th>
-              <th className="text-left border-b border-gray-200">Рейтинг</th>
-              <th className="text-left border-b border-gray-200">Отзывы</th>
+            <tr style={{ background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)' }}>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                🏢 Компания
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                📍 Город
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                🌐 Сайт
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                📧 Email
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                📞 Телефон
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                💬 Телеграм
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                📲 WhatsApp
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                ⭐ Рейтинг
+              </th>
+              <th style={{ 
+                padding: '1rem', 
+                textAlign: 'left', 
+                fontWeight: 700, 
+                color: '#374151',
+                borderBottom: '2px solid #e5e7eb',
+                fontSize: '0.875rem'
+              }}>
+                💬 Отзывы
+              </th>
             </tr>
           </thead>
           <tbody>
-            {leads.map((l) => (
-              <tr key={l.id}>
-                <td className="border-b border-gray-100" style={{ fontWeight: 600 }}>{l.company}</td>
-                <td className="border-b border-gray-100">{l.location}</td>
-                <td className="border-b border-gray-100">
-                  <a href={l.website} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9' }}>
-                    🌐 Сайт
+            {leads.map((l, index) => (
+              <tr 
+                key={l.id}
+                style={{ 
+                  background: index % 2 === 0 ? 'white' : '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f0f9ff';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = index % 2 === 0 ? 'white' : '#f9fafb';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <td style={{ padding: '1rem', fontWeight: 600, color: '#0f172a' }}>{l.company}</td>
+                <td style={{ padding: '1rem', color: '#6b7280' }}>{l.location}</td>
+                <td style={{ padding: '1rem' }}>
+                  <a href={l.website} target="_blank" rel="noreferrer" style={{ 
+                    color: '#0ea5e9', 
+                    textDecoration: 'none',
+                    fontWeight: 500,
+                    transition: 'color 0.2s ease'
+                  }}>
+                    🌐 Перейти
                   </a>
                 </td>
-                <td className="border-b border-gray-100">{l.email || '—'}</td>
-                <td className="border-b border-gray-100">{l.phone || '—'}</td>
-                <td className="border-b border-gray-100">
+                <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#374151' }}>
+                  {l.email || <span style={{ color: '#9ca3af' }}>—</span>}
+                </td>
+                <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
+                  {l.phone || <span style={{ color: '#9ca3af' }}>—</span>}
+                </td>
+                <td style={{ padding: '1rem' }}>
                   {l.telegram ? (
-                    <span style={{ color: '#0088cc', fontWeight: 500 }}>💬 {l.telegram}</span>
+                    <span style={{ 
+                      color: '#0088cc', 
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      background: '#f0f9ff',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '6px'
+                    }}>
+                      💬 {l.telegram}
+                    </span>
                   ) : (
                     <span style={{ color: '#9ca3af' }}>—</span>
                   )}
                 </td>
-                <td className="border-b border-gray-100">
+                <td style={{ padding: '1rem' }}>
                   {l.whatsapp ? (
-                    <span style={{ color: '#25d366', fontWeight: 500 }}>📲 {l.whatsapp}</span>
+                    <span style={{ 
+                      color: '#25d366', 
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      background: '#f0fdf4',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '6px'
+                    }}>
+                      📲 {l.whatsapp}
+                    </span>
                   ) : (
                     <span style={{ color: '#9ca3af' }}>—</span>
                   )}
                 </td>
-                <td className="border-b border-gray-100">
-                  <span style={{ color: '#f59e0b', fontWeight: 600 }}>⭐ {l.rating ?? '—'}</span>
+                <td style={{ padding: '1rem' }}>
+                  <span style={{ 
+                    color: '#f59e0b', 
+                    fontWeight: 700,
+                    background: '#fffbeb',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px'
+                  }}>
+                    ⭐ {l.rating ?? '—'}
+                  </span>
                 </td>
-                <td className="border-b border-gray-100">
-                  <span style={{ color: '#6b7280' }}>{l.reviews ?? '—'}</span>
+                <td style={{ padding: '1rem' }}>
+                  <span style={{ 
+                    color: '#6b7280',
+                    fontWeight: 600,
+                    background: '#f9fafb',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px'
+                  }}>
+                    {l.reviews ?? '—'}
+                  </span>
                 </td>
               </tr>
             ))}
             {!leads.length && (
               <tr>
-                <td colSpan={9} className="p-4 text-gray-400">Нет данных — задайте параметры и нажмите «Искать».</td>
+                <td colSpan={9} style={{ 
+                  padding: '3rem', 
+                  textAlign: 'center', 
+                  color: '#9ca3af',
+                  fontSize: '1.1rem'
+                }}>
+                  🔍 Нет данных — задайте параметры и нажмите «Искать лиды»
+                </td>
               </tr>
             )}
           </tbody>
