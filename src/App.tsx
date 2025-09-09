@@ -445,7 +445,7 @@ export default function App() {
                 color: '#0ea5e9',
                 marginBottom: '0.5rem'
               }}>
-                -60%
+                24ч
               </div>
               <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: '#0f172a' }}>
                 Время на поиск
@@ -499,7 +499,7 @@ export default function App() {
                 color: '#8b5cf6',
                 marginBottom: '0.5rem'
               }}>
-                24ч
+                -60%
               </div>
               <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: '#0f172a' }}>
                 Окупаемость
@@ -560,26 +560,141 @@ export default function App() {
                 Запуститесь за 10 минут и получите первые лиды сегодня. Никаких сложных настроек.
               </div>
             </div>
+            
+            <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
+              <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+                🔥
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Актуальные данные</div>
+              <div style={{ color: '#475569', lineHeight: 1.6 }}>
+                Обновляем базы ежедневно. Никаких устаревших контактов — только свежие лиды.
+              </div>
+            </div>
+            
+            <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
+              <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}>
+                🛡️
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Полная конфиденциальность</div>
+              <div style={{ color: '#475569', lineHeight: 1.6 }}>
+                Ваши поиски и данные защищены. Соблюдаем все требования GDPR и 152-ФЗ.
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how" style={{ padding: '32px 16px', background: '#fcfcfd' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2>Как это работает — 3 шага</h2>
-          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))' }}>
-            <div style={{ border: '1px dashed #cbd5e1', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>1. Укажите нишу и локацию</div>
-              <div style={{ color: '#475569' }}>Мы находим релевантные компании и сайты.</div>
+      {/* How it works - Dark theme */}
+      <section id="how" style={{ 
+        padding: '4rem 1rem', 
+        background: 'linear-gradient(135deg, #0f172a, #1e293b)',
+        color: '#e2e8f0'
+      }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: 'white' }}>
+              Как это работает — 3 простых шага
+            </h2>
+            <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
+              От поиска до первых звонков — всего несколько минут
+            </p>
+          </div>
+          <div style={{ 
+            display: 'grid', 
+            gap: '2rem', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))'
+          }}>
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px', 
+              padding: '2rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease'
+            }} className="step-card">
+              <div style={{ 
+                fontSize: '3rem', 
+                marginBottom: '1rem',
+                background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                width: '60px',
+                height: '60px',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.5rem'
+              }}>
+                🎯
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem', color: 'white' }}>
+                1. Укажите нишу и локацию
+              </div>
+              <div style={{ color: '#cbd5e1', lineHeight: 1.6 }}>
+                Мы находим релевантные компании и сайты по вашим критериям в любом городе России.
+              </div>
             </div>
-            <div style={{ border: '1px dashed #cbd5e1', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>2. Обогащаем контакты</div>
-              <div style={{ color: '#475569' }}>Добавляем email/телефон, проверяем валидность.</div>
+            
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px', 
+              padding: '2rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease'
+            }} className="step-card">
+              <div style={{ 
+                fontSize: '3rem', 
+                marginBottom: '1rem',
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                width: '60px',
+                height: '60px',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.5rem'
+              }}>
+                ✨
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem', color: 'white' }}>
+                2. Обогащаем контакты
+              </div>
+              <div style={{ color: '#cbd5e1', lineHeight: 1.6 }}>
+                Добавляем email, телефон и проверяем валидность. Только работающие контакты.
+              </div>
             </div>
-            <div style={{ border: '1px dashed #cbd5e1', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 600 }}>3. Экспорт и аутрич</div>
-              <div style={{ color: '#475569' }}>Выгрузите CSV и запускайте кампанию в тот же день.</div>
+            
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px', 
+              padding: '2rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease'
+            }} className="step-card">
+              <div style={{ 
+                fontSize: '3rem', 
+                marginBottom: '1rem',
+                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                width: '60px',
+                height: '60px',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.5rem'
+              }}>
+                🚀
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem', color: 'white' }}>
+                3. Экспорт и продажи
+              </div>
+              <div style={{ color: '#cbd5e1', lineHeight: 1.6 }}>
+                Выгружайте CSV и запускайте кампании. Первые звонки в тот же день.
+              </div>
             </div>
           </div>
         </div>
@@ -684,51 +799,133 @@ export default function App() {
       {/* Demo */}
       <Demo />
 
-      {/* Testimonials */}
-      <section style={{ padding: '4rem 1rem', background: '#fcfcfd' }}>
+      {/* Testimonials - Dark theme */}
+      <section style={{ 
+        padding: '4rem 1rem', 
+        background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+        color: '#e2e8f0'
+      }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: 'white' }}>
               Что говорят клиенты
             </h2>
-            <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
-              Реальные отзывы от предпринимателей, которые уже зарабатывают с нашим сервисом
+            <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
+              Реальные отзывы от предпринимателей, которые уже зарабатывают с Contacto
             </p>
           </div>
           <div className="testimonial-grid">
-            <div className="testimonial-card">
-              <div className="testimonial-text">
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease'
+            }} className="testimonial-card-dark">
+              <div style={{ 
+                fontStyle: 'italic',
+                marginBottom: '1.5rem',
+                fontSize: '1.1rem',
+                lineHeight: 1.6,
+                color: '#e2e8f0'
+              }}>
                 «Первые встречи на 2‑й день, окупили подписку одной сделкой. Качество лидов намного выше, чем у конкурентов.»
               </div>
-              <div className="testimonial-author">
-                <div className="author-avatar">А</div>
-                <div className="author-info">
-                  <div className="author-name">Андрей Козлов</div>
-                  <div className="author-role">Директор агентства рекламы</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ 
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 600
+                }}>
+                  А
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, marginBottom: '0.25rem', color: 'white' }}>Андрей Козлов</div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Директор агентства рекламы</div>
                 </div>
               </div>
             </div>
-            <div className="testimonial-card">
-              <div className="testimonial-text">
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease'
+            }} className="testimonial-card-dark">
+              <div style={{ 
+                fontStyle: 'italic',
+                marginBottom: '1.5rem',
+                fontSize: '1.1rem',
+                lineHeight: 1.6,
+                color: '#e2e8f0'
+              }}>
                 «Качество email‑ов выше, чем в таблицах, что покупали раньше. Доставляемость 95%+, отвечают реальные люди.»
               </div>
-              <div className="testimonial-author">
-                <div className="author-avatar">Н</div>
-                <div className="author-info">
-                  <div className="author-name">Наталья Смирнова</div>
-                  <div className="author-role">CEO SaaS‑стартапа</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ 
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 600
+                }}>
+                  Н
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, marginBottom: '0.25rem', color: 'white' }}>Наталья Смирнова</div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>CEO SaaS‑стартапа</div>
                 </div>
               </div>
             </div>
-            <div className="testimonial-card">
-              <div className="testimonial-text">
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease'
+            }} className="testimonial-card-dark">
+              <div style={{ 
+                fontStyle: 'italic',
+                marginBottom: '1.5rem',
+                fontSize: '1.1rem',
+                lineHeight: 1.6,
+                color: '#e2e8f0'
+              }}>
                 «Лиды в нише HVAC нашли быстро, CSV выгрузили — пошли заявки. За месяц закрыли 8 сделок на ₽2.4М.»
               </div>
-              <div className="testimonial-author">
-                <div className="author-avatar">О</div>
-                <div className="author-info">
-                  <div className="author-name">Олег Петров</div>
-                  <div className="author-role">Основатель локального сервиса</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ 
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 600
+                }}>
+                  О
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, marginBottom: '0.25rem', color: 'white' }}>Олег Петров</div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Основатель локального сервиса</div>
                 </div>
               </div>
             </div>
