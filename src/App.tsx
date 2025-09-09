@@ -206,7 +206,7 @@ function AutocompleteInput({
 function Demo() {
   const [niche, setNiche] = useState('')
   const [location, setLocation] = useState('')
-  const [limit, setLimit] = useState<number>(50)
+  const [limit, setLimit] = useState<number>(20)
   const [minReviews] = useState<number>(50)
   const [recentOnly, setRecentOnly] = useState<boolean>(false)
   const [hasTelegram, setHasTelegram] = useState<boolean>(false)
@@ -232,7 +232,7 @@ function Demo() {
       if (useMockData) {
         // Mock данные для GitHub Pages
         await new Promise(resolve => setTimeout(resolve, 1000)) // имитация задержки
-        const requestedCount = Math.min(Number(limit) || 20, 500)
+        const requestedCount = Math.min(Number(limit) || 20, 200)
         const now = Date.now()
         
         // Генерируем больше данных, чем нужно, чтобы после фильтрации получить точное количество
@@ -456,14 +456,14 @@ function Demo() {
               <input 
                 type="range" 
                 min={10} 
-                max={500} 
+                max={200} 
                 value={limit} 
                 onChange={e => setLimit(Number(e.target.value))} 
                 style={{
                   width: '100%',
                   height: '6px',
                   borderRadius: '3px',
-                  background: `linear-gradient(to right, #0ea5e9 0%, #0ea5e9 ${((limit - 10) / (500 - 10)) * 100}%, #e5e7eb ${((limit - 10) / (500 - 10)) * 100}%, #e5e7eb 100%)`,
+                  background: `linear-gradient(to right, #0ea5e9 0%, #0ea5e9 ${((limit - 10) / (200 - 10)) * 100}%, #e5e7eb ${((limit - 10) / (200 - 10)) * 100}%, #e5e7eb 100%)`,
                   outline: 'none',
                   appearance: 'none',
                   cursor: 'pointer'
@@ -477,7 +477,7 @@ function Demo() {
                 marginTop: '0.5rem' 
               }}>
                 <span>10</span>
-                <span>500</span>
+                <span>200</span>
               </div>
             </div>
 
