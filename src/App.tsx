@@ -13,21 +13,6 @@ const FadeKeyframes = () => (
   `}</style>
 )
 
-function useParallax() {
-  const [style, setStyle] = useState<React.CSSProperties>({})
-  const onMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width - 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5
-    const rotateY = -18 + x * 10
-    const rotateX = 8 - y * 8
-    setStyle({ transform: `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateY(0)` })
-  }
-  const onLeave: React.MouseEventHandler<HTMLDivElement> = () => {
-    setStyle({ transform: 'rotateY(-18deg) rotateX(8deg) translateY(0)' })
-  }
-  return { style, onMove, onLeave }
-}
 
 function MockCard3D() {
   return (
@@ -106,34 +91,75 @@ function Demo() {
     setError('')
     setStage('search')
     try {
-      const res = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ niche, location, limit, minReviews, recentOnly, hasInstagram })
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      const items: Lead[] = data.items || []
-      setLeads(items)
-      setStage('enrich')
-      // быстрый проход обогащения первых N
-      const upto = Math.min(items.length, 20)
-      for (let i = 0; i < upto; i++) {
-        const it = items[i]
-        const r = await fetch('/api/enrich', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ website: it.website })
+      // Проверяем, работает ли API сервер
+      const isProduction = window.location.hostname.includes('github.io')
+      
+      if (isProduction) {
+        // Mock данные для GitHub Pages
+        await new Promise(resolve => setTimeout(resolve, 1000)) // имитация задержки
+        const max = Math.min(Number(limit) || 20, 100)
+        const now = Date.now()
+        
+        const items = Array.from({ length: max }).map((_, i) => {
+          const reviews = Math.floor(Math.random() * 500)
+          const rating = (Math.random() * 2 + 3).toFixed(1) // 3.0 - 5.0
+          const ig = Math.random() > 0.5 ? `https://instagram.com/example_${i + 1}` : ''
+          const openedAt = now - Math.floor(Math.random() * 400) * 24 * 3600 * 1000 // дни назад
+          const domain = `example-${i + 1}.com`
+          const quality = Math.random()
+          const tag = quality > 0.7 ? 'verified' : quality > 0.35 ? 'guessed' : 'unknown'
+          
+          return {
+            id: i + 1,
+            company: `${niche} Company ${i + 1}`,
+            location: location || 'Москва',
+            website: `https://${domain}`,
+            email: (tag === 'unknown') ? '' : `info@${domain}`,
+            phone: '+1-555-0100',
+            rating: Number(rating),
+            reviews,
+            instagram: ig,
+            openedAt,
+            source: 'demo',
+            emailQuality: tag as 'verified' | 'guessed' | 'unknown'
+          }
+        }).filter(r => r.reviews >= Number(minReviews))
+          .filter(r => !hasInstagram || !!r.instagram)
+          .filter(r => !recentOnly || (now - r.openedAt) < 365 * 24 * 3600 * 1000)
+        
+        setLeads(items)
+        setStage('done')
+      } else {
+        // Обычная логика для локального сервера
+        const res = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ niche, location, limit, minReviews, recentOnly, hasInstagram })
         })
-        if (r.ok) {
-          const d = await r.json()
-          setLeads(prev => {
-            const copy = [...prev]
-            const idx = copy.findIndex(x => x.id === it.id)
-            if (idx >= 0) copy[idx] = { ...copy[idx], email: d.email, phone: d.phone, emailQuality: d.emailQuality }
-            return copy
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const data = await res.json()
+        const items: Lead[] = data.items || []
+        setLeads(items)
+        setStage('enrich')
+        // быстрый проход обогащения первых N
+        const upto = Math.min(items.length, 20)
+        for (let i = 0; i < upto; i++) {
+          const it = items[i]
+          const r = await fetch('/api/enrich', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ website: it.website })
           })
+          if (r.ok) {
+            const d = await r.json()
+            setLeads(prev => {
+              const copy = [...prev]
+              const idx = copy.findIndex(x => x.id === it.id)
+              if (idx >= 0) copy[idx] = { ...copy[idx], email: d.email, phone: d.phone, emailQuality: d.emailQuality }
+              return copy
+            })
+          }
         }
+        setStage('done')
       }
-      setStage('done')
     } catch (err: any) {
       setError(err?.message || 'Ошибка запроса')
       setStage('idle')
@@ -251,13 +277,23 @@ export default function App() {
     e.preventDefault()
     setSending(true); setErr(''); setDone('')
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, email, notes })
-      })
-      if (!res.ok) throw new Error('Ошибка оформления')
-      setDone('Заявка отправлена! Мы свяжемся с вами по email.')
+      const isProduction = window.location.hostname.includes('github.io')
+      
+      if (isProduction) {
+        // Mock для GitHub Pages - имитация отправки заявки
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        console.log('Demo checkout request:', { plan, email, notes })
+        setDone('Демо режим: Заявка имитирована! В реальной версии мы свяжемся с вами по email.')
+      } else {
+        // Обычная логика для локального сервера
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, email, notes })
+        })
+        if (!res.ok) throw new Error('Ошибка оформления')
+        setDone('Заявка отправлена! Мы свяжемся с вами по email.')
+      }
     } catch (e: any) {
       setErr(e?.message || 'Ошибка сети')
     } finally {
