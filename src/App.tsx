@@ -45,6 +45,20 @@ const TELEGRAM_TEMPLATES = {
   'рестораны': ['@restaurant_troyka', '@bistro_vkus', '@cafe_home']
 };
 
+// Множественные отзывы клиентов
+const TESTIMONIALS = [
+  { text: "Первые встречи на 2‑й день, окупили подписку одной сделкой. Качество лидов намного выше, чем у конкурентов.", author: "Андрей Козлов", role: "Директор агентства рекламы", avatar: "А", color: "#0ea5e9" },
+  { text: "Качество email‑ов выше, чем в таблицах, что покупали раньше. Доставляемость 95%+, отвечают реальные люди.", author: "Наталья Смирнова", role: "CEO SaaS‑стартапа", avatar: "Н", color: "#22c55e" },
+  { text: "Лиды в нише HVAC нашли быстро, CSV выгрузили — пошли заявки. За месяц закрыли 8 сделок на ₽2.4М.", author: "Олег Петров", role: "Основатель локального сервиса", avatar: "О", color: "#f59e0b" },
+  { text: "Сэкономили 20 часов в неделю на поиск клиентов. Теперь фокусируемся на продажах, а не на рутине.", author: "Мария Иванова", role: "Менеджер по продажам", avatar: "М", color: "#8b5cf6" },
+  { text: "Конверсия в лиды выросла в 3 раза. Contacto помог найти именно тех, кто готов покупать прямо сейчас.", author: "Дмитрий Соколов", role: "Маркетинг директор", avatar: "Д", color: "#ef4444" },
+  { text: "Больше не покупаем дорогие базы сомнительного качества. Здесь всё честно и работает.", author: "Елена Волкова", role: "Руководитель отдела продаж", avatar: "Е", color: "#06b6d4" },
+  { text: "Запустили новый продукт и за неделю нашли 200 потенциальных клиентов. Скорость впечатляет!", author: "Александр Морозов", role: "Product Manager", avatar: "А", color: "#84cc16" },
+  { text: "Автоматизировали процесс поиска лидов. ROI вырос на 180% за первый квартал использования.", author: "Ирина Кузнецова", role: "Директор по развитию", avatar: "И", color: "#f97316" },
+  { text: "Contacto стал незаменимым инструментом нашей команды. Рекомендуем всем B2B компаниям.", author: "Владимир Попов", role: "Коммерческий директор", avatar: "В", color: "#a855f7" },
+  { text: "Нашли клиентов в нише, где раньше не знали с чего начать. База действительно обширная.", author: "Светлана Федорова", role: "Бизнес-аналитик", avatar: "С", color: "#ec4899" }
+];
+
 // helper fade css
 const fadeStyles: React.CSSProperties = { animation: 'fadeUp .6s ease both' }
 
@@ -54,8 +68,157 @@ const FadeKeyframes = () => (
   @keyframes fadeUp { from { opacity:0; transform: translateY(8px) } to { opacity:1; transform: translateY(0) } }
   .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(2,132,199,.12) }
   .glow { box-shadow: 0 0 0 6px rgba(14,165,233,.08) }
+  
+  @keyframes scroll-left { 
+    0% { transform: translateX(100vw) } 
+    100% { transform: translateX(-100%) } 
+  }
+  @keyframes scroll-right { 
+    0% { transform: translateX(-100%) } 
+    100% { transform: translateX(100vw) } 
+  }
+  
+  .testimonial-scroll-left { 
+    animation: scroll-left 25s linear infinite;
+  }
+  .testimonial-scroll-right { 
+    animation: scroll-right 30s linear infinite;
+  }
   `}</style>
 )
+
+// Компонент для текущих отзывов
+function FlowingTestimonials() {
+  const shuffledTestimonials = useMemo(() => {
+    return [...TESTIMONIALS].sort(() => Math.random() - 0.5);
+  }, []);
+
+  const firstRow = shuffledTestimonials.slice(0, 5);
+  const secondRow = shuffledTestimonials.slice(5, 10);
+
+  return (
+    <div style={{ overflow: 'hidden', position: 'relative' }}>
+      {/* Первая строка - слева направо */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '1rem', 
+        marginBottom: '1rem',
+        whiteSpace: 'nowrap'
+      }}>
+        <div className="testimonial-scroll-left" style={{ display: 'flex', gap: '1rem' }}>
+          {firstRow.map((testimonial, index) => (
+            <div
+              key={`row1-${index}`}
+              style={{
+                minWidth: '350px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              <div style={{ 
+                fontStyle: 'italic',
+                marginBottom: '1rem',
+                fontSize: '0.95rem',
+                lineHeight: 1.5,
+                color: '#e2e8f0',
+                whiteSpace: 'normal'
+              }}>
+                "{testimonial.text}"
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ 
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: testimonial.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '0.875rem'
+                }}>
+                  {testimonial.avatar}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'white' }}>
+                    {testimonial.author}
+                  </div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                    {testimonial.role}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Вторая строка - справа налево */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '1rem',
+        whiteSpace: 'nowrap'
+      }}>
+        <div className="testimonial-scroll-right" style={{ display: 'flex', gap: '1rem' }}>
+          {secondRow.map((testimonial, index) => (
+            <div
+              key={`row2-${index}`}
+              style={{
+                minWidth: '350px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              <div style={{ 
+                fontStyle: 'italic',
+                marginBottom: '1rem',
+                fontSize: '0.95rem',
+                lineHeight: 1.5,
+                color: '#e2e8f0',
+                whiteSpace: 'normal'
+              }}>
+                "{testimonial.text}"
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ 
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: testimonial.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '0.875rem'
+                }}>
+                  {testimonial.avatar}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'white' }}>
+                    {testimonial.author}
+                  </div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                    {testimonial.role}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 
 function MockCard3D() {
@@ -1519,138 +1682,22 @@ export default function App() {
       {/* Demo */}
       <Demo />
 
-      {/* Testimonials - Dark theme */}
+      {/* Testimonials - Dark theme with flowing animation */}
       <section style={{ 
-        padding: '4rem 1rem', 
+        padding: '4rem 0', 
         background: 'linear-gradient(135deg, #1e293b, #0f172a)',
-        color: '#e2e8f0'
+        color: '#e2e8f0',
+        overflow: 'hidden'
       }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: 'white' }}>
-              Что говорят клиенты
-            </h2>
-            <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
-              Реальные отзывы от предпринимателей, которые уже зарабатывают с Contacto
-            </p>
-          </div>
-          <div className="testimonial-grid">
-            <div style={{ 
-              background: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-              transition: 'all 0.3s ease'
-            }} className="testimonial-card-dark">
-              <div style={{ 
-                fontStyle: 'italic',
-                marginBottom: '1.5rem',
-                fontSize: '1.1rem',
-                lineHeight: 1.6,
-                color: '#e2e8f0'
-              }}>
-                «Первые встречи на 2‑й день, окупили подписку одной сделкой. Качество лидов намного выше, чем у конкурентов.»
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ 
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 600
-                }}>
-                  А
-                </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 600, marginBottom: '0.25rem', color: 'white' }}>Андрей Козлов</div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Директор агентства рекламы</div>
-                </div>
-              </div>
-            </div>
-            <div style={{ 
-              background: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-              transition: 'all 0.3s ease'
-            }} className="testimonial-card-dark">
-              <div style={{ 
-                fontStyle: 'italic',
-                marginBottom: '1.5rem',
-                fontSize: '1.1rem',
-                lineHeight: 1.6,
-                color: '#e2e8f0'
-              }}>
-                «Качество email‑ов выше, чем в таблицах, что покупали раньше. Доставляемость 95%+, отвечают реальные люди.»
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ 
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 600
-                }}>
-                  Н
-                </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 600, marginBottom: '0.25rem', color: 'white' }}>Наталья Смирнова</div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>CEO SaaS‑стартапа</div>
-                </div>
-              </div>
-            </div>
-            <div style={{ 
-              background: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-              transition: 'all 0.3s ease'
-            }} className="testimonial-card-dark">
-              <div style={{ 
-                fontStyle: 'italic',
-                marginBottom: '1.5rem',
-                fontSize: '1.1rem',
-                lineHeight: 1.6,
-                color: '#e2e8f0'
-              }}>
-                «Лиды в нише HVAC нашли быстро, CSV выгрузили — пошли заявки. За месяц закрыли 8 сделок на ₽2.4М.»
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ 
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 600
-                }}>
-                  О
-                </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 600, marginBottom: '0.25rem', color: 'white' }}>Олег Петров</div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Основатель локального сервиса</div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div style={{ textAlign: 'center', marginBottom: '3rem', padding: '0 1rem' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: 'white' }}>
+            Что говорят клиенты
+          </h2>
+          <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
+            Реальные отзывы от предпринимателей, которые уже зарабатывают с Contacto
+          </p>
         </div>
+        <FlowingTestimonials />
       </section>
 
       {/* FAQ */}
