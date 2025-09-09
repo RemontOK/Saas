@@ -56,7 +56,13 @@ const TESTIMONIALS = [
   { text: "Запустили новый продукт и за неделю нашли 200 потенциальных клиентов. Скорость впечатляет!", author: "Александр Морозов", role: "Product Manager", avatar: "А", color: "#84cc16" },
   { text: "Автоматизировали процесс поиска лидов. ROI вырос на 180% за первый квартал использования.", author: "Ирина Кузнецова", role: "Директор по развитию", avatar: "И", color: "#f97316" },
   { text: "Contacto стал незаменимым инструментом нашей команды. Рекомендуем всем B2B компаниям.", author: "Владимир Попов", role: "Коммерческий директор", avatar: "В", color: "#a855f7" },
-  { text: "Нашли клиентов в нише, где раньше не знали с чего начать. База действительно обширная.", author: "Светлана Федорова", role: "Бизнес-аналитик", avatar: "С", color: "#ec4899" }
+  { text: "Нашли клиентов в нише, где раньше не знали с чего начать. База действительно обширная.", author: "Светлана Федорова", role: "Бизнес-аналитик", avatar: "С", color: "#ec4899" },
+  { text: "Увеличили конверсию холодных звонков на 250%. Теперь каждый третий звонок приводит к встрече.", author: "Максим Лебедев", role: "Руководитель отдела продаж", avatar: "М", color: "#10b981" },
+  { text: "Contacto помог масштабировать бизнес в 5 регионах. Качество данных превзошло все ожидания.", author: "Татьяна Новикова", role: "Региональный директор", avatar: "Т", color: "#3b82f6" },
+  { text: "За 3 месяца использования окупили годовую подписку. Лучшая инвестиция в развитие продаж.", author: "Сергей Васильев", role: "Основатель IT-компании", avatar: "С", color: "#8b5cf6" },
+  { text: "Нашли ключевых партнеров в B2B сегменте за 2 недели. Раньше на это уходили месяцы.", author: "Анна Михайлова", role: "Директор по партнерству", avatar: "А", color: "#f59e0b" },
+  { text: "Качество лидов в строительной нише просто космос! 70% отвечают в первый день.", author: "Игорь Романов", role: "Владелец строительной компании", avatar: "И", color: "#ef4444" },
+  { text: "Contacto заменил нам целый отдел по поиску клиентов. Экономия бюджета колоссальная.", author: "Юлия Павлова", role: "Финансовый директор", avatar: "Ю", color: "#06b6d4" }
 ];
 
 // helper fade css
@@ -69,158 +75,94 @@ const FadeKeyframes = () => (
   .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(2,132,199,.12) }
   .glow { box-shadow: 0 0 0 6px rgba(14,165,233,.08) }
   
-  @keyframes scroll-left { 
-    0% { transform: translateX(0%) } 
-    100% { transform: translateX(-33.33%) } 
-  }
-  @keyframes scroll-right { 
-    0% { transform: translateX(-33.33%) } 
-    100% { transform: translateX(0%) } 
+  @keyframes slide-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
   
-  .testimonial-scroll-left { 
-    animation: scroll-left 40s linear infinite;
+  @keyframes slide-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
   }
-  .testimonial-scroll-right { 
-    animation: scroll-right 45s linear infinite;
-  }
+  
+  
   `}</style>
 )
 
-// Компонент для бесконечно текущих отзывов
+// Простые красивые отзывы без заморочек
 function FlowingTestimonials() {
   const shuffledTestimonials = useMemo(() => {
     return [...TESTIMONIALS].sort(() => Math.random() - 0.5);
   }, []);
 
-  const firstRow = shuffledTestimonials.slice(0, 5);
-  const secondRow = shuffledTestimonials.slice(5, 10);
-
-  // Дублируем отзывы для бесконечной прокрутки
-  const infiniteFirstRow = [...firstRow, ...firstRow, ...firstRow];
-  const infiniteSecondRow = [...secondRow, ...secondRow, ...secondRow];
-
   return (
-    <div style={{ overflow: 'hidden', position: 'relative' }}>
-      {/* Первая строка - слева направо */}
+    <div style={{ padding: '0 1rem' }}>
+      {/* Простая адаптивная сетка отзывов */}
       <div style={{ 
-        display: 'flex', 
-        gap: '1rem', 
-        marginBottom: '1rem',
-        whiteSpace: 'nowrap'
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+        gap: '2rem',
+        maxWidth: '1200px',
+        margin: '0 auto'
       }}>
-        <div className="testimonial-scroll-left" style={{ display: 'flex', gap: '1rem' }}>
-          {infiniteFirstRow.map((testimonial, index) => (
-            <div
-              key={`row1-${index}`}
-              style={{
-                minWidth: '350px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
-                padding: '1.5rem',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-                transition: 'all 0.3s ease'
-              }}
-            >
+        {shuffledTestimonials.slice(0, 6).map((testimonial, index) => (
+          <div
+            key={`testimonial-${index}`}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            <div style={{ 
+              fontStyle: 'italic',
+              marginBottom: '1.5rem',
+              fontSize: '1.1rem',
+              lineHeight: 1.6,
+              color: '#e2e8f0'
+            }}>
+              "{testimonial.text}"
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div style={{ 
-                fontStyle: 'italic',
-                marginBottom: '1rem',
-                fontSize: '0.95rem',
-                lineHeight: 1.5,
-                color: '#e2e8f0',
-                whiteSpace: 'normal'
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: testimonial.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 700,
+                fontSize: '1.3rem',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
               }}>
-                "{testimonial.text}"
+                {testimonial.avatar}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ 
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: testimonial.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '0.875rem'
-                }}>
-                  {testimonial.avatar}
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '1.1rem', color: 'white', marginBottom: '0.25rem' }}>
+                  {testimonial.author}
                 </div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'white' }}>
-                    {testimonial.author}
-                  </div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
-                    {testimonial.role}
-                  </div>
+                <div style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+                  {testimonial.role}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Вторая строка - справа налево */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '1rem',
-        whiteSpace: 'nowrap'
-      }}>
-        <div className="testimonial-scroll-right" style={{ display: 'flex', gap: '1rem' }}>
-          {infiniteSecondRow.map((testimonial, index) => (
-            <div
-              key={`row2-${index}`}
-              style={{
-                minWidth: '350px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
-                padding: '1.5rem',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              <div style={{ 
-                fontStyle: 'italic',
-                marginBottom: '1rem',
-                fontSize: '0.95rem',
-                lineHeight: 1.5,
-                color: '#e2e8f0',
-                whiteSpace: 'normal'
-              }}>
-                "{testimonial.text}"
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ 
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: testimonial.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '0.875rem'
-                }}>
-                  {testimonial.avatar}
-                </div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'white' }}>
-                    {testimonial.author}
-                  </div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
-                    {testimonial.role}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -1301,7 +1243,7 @@ export default function App() {
                 Начать зарабатывать
               </button>
             </a>
-          </div>
+        </div>
 
           {/* Mobile Menu Button */}
           <button
