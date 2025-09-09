@@ -219,7 +219,7 @@ function Demo() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [error, setError] = useState<string>('')
 
-  const canSearch = useMemo(() => niche.trim().length > 1 && stage !== 'search', [niche, stage])
+  const canSearch = useMemo(() => niche.trim().length > 1 && stage !== 'search', [niche, location, limit, sortBy, hasEmail, hasWebsite, hasTelegram, hasWhatsApp, recentOnly, stage])
 
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -644,10 +644,14 @@ function Demo() {
                 padding: '0.875rem 2.5rem', 
                 fontSize: '1rem',
                 minWidth: '160px',
-                borderRadius: '12px'
+                borderRadius: '12px',
+                background: stage === 'done' ? '#22c55e' : '#0ea5e9',
+                borderColor: stage === 'done' ? '#22c55e' : '#0ea5e9'
               }}
             >
-              {stage === 'search' ? '🔍 Ищем...' : '🚀 Искать лиды'}
+              {stage === 'search' ? '🔍 Ищем...' : 
+               stage === 'done' ? '🔄 Искать заново' : 
+               '🚀 Искать лиды'}
             </button>
             
             <button 
@@ -704,97 +708,119 @@ function Demo() {
             )}
         </div>
       </form>
-      <div className="demo-table" style={{ marginTop: '2rem' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
+      <div className="demo-table" style={{ marginTop: '2rem', overflowX: 'auto' }}>
+        <table style={{ 
+          width: '100%', 
+          borderCollapse: 'separate', 
+          borderSpacing: '0',
+          minWidth: '800px'
+        }}>
           <thead>
             <tr style={{ background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)' }}>
               <th style={{ 
-                padding: '1rem', 
+                padding: '0.75rem', 
                 textAlign: 'left', 
                 fontWeight: 700, 
                 color: '#374151',
                 borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
+                fontSize: '0.8rem',
+                whiteSpace: 'nowrap'
               }}>
                 🏢 Компания
               </th>
               <th style={{ 
-                padding: '1rem', 
+                padding: '0.75rem', 
                 textAlign: 'left', 
                 fontWeight: 700, 
                 color: '#374151',
                 borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
+                fontSize: '0.8rem',
+                whiteSpace: 'nowrap'
               }}>
                 📍 Город
               </th>
+              {hasWebsite && (
+                <th style={{ 
+                  padding: '0.75rem', 
+                  textAlign: 'left', 
+                  fontWeight: 700, 
+                  color: '#374151',
+                  borderBottom: '2px solid #e5e7eb',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  🌐 Сайт
+                </th>
+              )}
+              {hasEmail && (
+                <th style={{ 
+                  padding: '0.75rem', 
+                  textAlign: 'left', 
+                  fontWeight: 700, 
+                  color: '#374151',
+                  borderBottom: '2px solid #e5e7eb',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  📧 Email
+                </th>
+              )}
               <th style={{ 
-                padding: '1rem', 
+                padding: '0.75rem', 
                 textAlign: 'left', 
                 fontWeight: 700, 
                 color: '#374151',
                 borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
-              }}>
-                🌐 Сайт
-              </th>
-              <th style={{ 
-                padding: '1rem', 
-                textAlign: 'left', 
-                fontWeight: 700, 
-                color: '#374151',
-                borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
-              }}>
-                📧 Email
-              </th>
-              <th style={{ 
-                padding: '1rem', 
-                textAlign: 'left', 
-                fontWeight: 700, 
-                color: '#374151',
-                borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
+                fontSize: '0.8rem',
+                whiteSpace: 'nowrap'
               }}>
                 📞 Телефон
               </th>
+              {hasTelegram && (
+                <th style={{ 
+                  padding: '0.75rem', 
+                  textAlign: 'left', 
+                  fontWeight: 700, 
+                  color: '#374151',
+                  borderBottom: '2px solid #e5e7eb',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  💬 TG
+                </th>
+              )}
+              {hasWhatsApp && (
+                <th style={{ 
+                  padding: '0.75rem', 
+                  textAlign: 'left', 
+                  fontWeight: 700, 
+                  color: '#374151',
+                  borderBottom: '2px solid #e5e7eb',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  📲 WA
+                </th>
+              )}
               <th style={{ 
-                padding: '1rem', 
+                padding: '0.75rem', 
                 textAlign: 'left', 
                 fontWeight: 700, 
                 color: '#374151',
                 borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
-              }}>
-                💬 Телеграм
-              </th>
-              <th style={{ 
-                padding: '1rem', 
-                textAlign: 'left', 
-                fontWeight: 700, 
-                color: '#374151',
-                borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
-              }}>
-                📲 WhatsApp
-              </th>
-              <th style={{ 
-                padding: '1rem', 
-                textAlign: 'left', 
-                fontWeight: 700, 
-                color: '#374151',
-                borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
+                fontSize: '0.8rem',
+                whiteSpace: 'nowrap'
               }}>
                 ⭐ Рейтинг
               </th>
               <th style={{ 
-                padding: '1rem', 
+                padding: '0.75rem', 
                 textAlign: 'left', 
                 fontWeight: 700, 
                 color: '#374151',
                 borderBottom: '2px solid #e5e7eb',
-                fontSize: '0.875rem'
+                fontSize: '0.8rem',
+                whiteSpace: 'nowrap'
               }}>
                 💬 Отзывы
               </th>
@@ -821,74 +847,114 @@ function Demo() {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <td style={{ padding: '1rem', fontWeight: 600, color: '#0f172a' }}>{l.company}</td>
-                <td style={{ padding: '1rem', color: '#6b7280' }}>{l.location}</td>
-                <td style={{ padding: '1rem' }}>
-                  <a href={l.website} target="_blank" rel="noreferrer" style={{ 
-                    color: '#0ea5e9', 
-                    textDecoration: 'none',
-                    fontWeight: 500,
-                    transition: 'color 0.2s ease'
+                <td style={{ 
+                  padding: '0.75rem', 
+                  fontWeight: 600, 
+                  color: '#0f172a',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '120px'
+                }}>
+                  <span title={l.company}>{l.company}</span>
+                </td>
+                <td style={{ 
+                  padding: '0.75rem', 
+                  color: '#6b7280',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {l.location}
+                </td>
+                {hasWebsite && (
+                  <td style={{ padding: '0.75rem', whiteSpace: 'nowrap' }}>
+                    <a href={l.website} target="_blank" rel="noreferrer" style={{ 
+                      color: '#0ea5e9', 
+                      textDecoration: 'none',
+                      fontWeight: 500,
+                      transition: 'color 0.2s ease'
+                    }}>
+                      🌐 Сайт
+                    </a>
+                  </td>
+                )}
+                {hasEmail && (
+                  <td style={{ 
+                    padding: '0.75rem', 
+                    fontSize: '0.8rem', 
+                    color: '#374151',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '140px'
                   }}>
-                    🌐 Перейти
-                  </a>
-                </td>
-                <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#374151' }}>
-                  {l.email || <span style={{ color: '#9ca3af' }}>—</span>}
-                </td>
-                <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
+                    <span title={l.email}>{l.email || <span style={{ color: '#9ca3af' }}>—</span>}</span>
+                  </td>
+                )}
+                <td style={{ 
+                  padding: '0.75rem', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 500, 
+                  color: '#374151',
+                  whiteSpace: 'nowrap'
+                }}>
                   {l.phone || <span style={{ color: '#9ca3af' }}>—</span>}
                 </td>
-                <td style={{ padding: '1rem' }}>
-                  {l.telegram ? (
-                    <span style={{ 
-                      color: '#0088cc', 
-                      fontWeight: 500,
-                      fontSize: '0.875rem',
-                      background: '#f0f9ff',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '6px'
-                    }}>
-                      💬 {l.telegram}
-                    </span>
-                  ) : (
-                    <span style={{ color: '#9ca3af' }}>—</span>
-                  )}
-                </td>
-                <td style={{ padding: '1rem' }}>
-                  {l.whatsapp ? (
-                    <span style={{ 
-                      color: '#25d366', 
-                      fontWeight: 500,
-                      fontSize: '0.875rem',
-                      background: '#f0fdf4',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '6px'
-                    }}>
-                      📲 {l.whatsapp}
-                    </span>
-                  ) : (
-                    <span style={{ color: '#9ca3af' }}>—</span>
-                  )}
-                </td>
-                <td style={{ padding: '1rem' }}>
+                {hasTelegram && (
+                  <td style={{ padding: '0.75rem', whiteSpace: 'nowrap' }}>
+                    {l.telegram ? (
+                      <span style={{ 
+                        color: '#0088cc', 
+                        fontWeight: 500,
+                        fontSize: '0.8rem',
+                        background: '#f0f9ff',
+                        padding: '0.2rem 0.4rem',
+                        borderRadius: '4px'
+                      }}>
+                        💬 {l.telegram}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#9ca3af' }}>—</span>
+                    )}
+                  </td>
+                )}
+                {hasWhatsApp && (
+                  <td style={{ padding: '0.75rem', whiteSpace: 'nowrap' }}>
+                    {l.whatsapp ? (
+                      <span style={{ 
+                        color: '#25d366', 
+                        fontWeight: 500,
+                        fontSize: '0.8rem',
+                        background: '#f0fdf4',
+                        padding: '0.2rem 0.4rem',
+                        borderRadius: '4px'
+                      }}>
+                        📲 WA
+                      </span>
+                    ) : (
+                      <span style={{ color: '#9ca3af' }}>—</span>
+                    )}
+                  </td>
+                )}
+                <td style={{ padding: '0.75rem', whiteSpace: 'nowrap' }}>
                   <span style={{ 
                     color: '#f59e0b', 
                     fontWeight: 700,
                     background: '#fffbeb',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '6px'
+                    padding: '0.2rem 0.4rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem'
                   }}>
                     ⭐ {l.rating ?? '—'}
                   </span>
                 </td>
-                <td style={{ padding: '1rem' }}>
+                <td style={{ padding: '0.75rem', whiteSpace: 'nowrap' }}>
                   <span style={{ 
                     color: '#6b7280',
                     fontWeight: 600,
                     background: '#f9fafb',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '6px'
+                    padding: '0.2rem 0.4rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem'
                   }}>
                     {l.reviews ?? '—'}
                   </span>
@@ -897,7 +963,7 @@ function Demo() {
             ))}
             {!leads.length && (
               <tr>
-                <td colSpan={9} style={{ 
+                <td colSpan={5 + (hasWebsite ? 1 : 0) + (hasEmail ? 1 : 0) + (hasTelegram ? 1 : 0) + (hasWhatsApp ? 1 : 0)} style={{ 
                   padding: '3rem', 
                   textAlign: 'center', 
                   color: '#9ca3af',
