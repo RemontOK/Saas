@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { registerUser } from '../services/auth';
+import type { RegisterData } from '../services/auth';
 
 interface RegisterProps {
   selectedPlan?: string;
@@ -24,7 +26,7 @@ export default function Register({ selectedPlan, onSuccess, onSwitchToLogin }: R
     setLoading(true);
     setErrors({});
 
-    // Простая валидация
+    // Валидация
     const newErrors: Record<string, string> = {};
     
     if (!formData.name.trim()) newErrors.name = 'Введите имя';
@@ -36,6 +38,8 @@ export default function Register({ selectedPlan, onSuccess, onSwitchToLogin }: R
     if (formData.password.length < 6) {
       newErrors.password = 'Пароль должен быть минимум 6 символов';
     }
+    if (!formData.company.trim()) newErrors.company = 'Введите название компании';
+    if (!formData.phone.trim()) newErrors.phone = 'Введите телефон';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -44,34 +48,36 @@ export default function Register({ selectedPlan, onSuccess, onSwitchToLogin }: R
     }
 
     try {
-      // Имитация регистрации/входа
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const registerData: RegisterData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        company: formData.company,
+        phone: formData.phone,
+        plan: selectedPlan || 'Starter'
+      };
       
-      // Проверяем, есть ли уже пользователь с таким email
-      const existingUser = localStorage.getItem('user');
-      if (existingUser) {
-        const userData = JSON.parse(existingUser);
-        if (userData.email === formData.email) {
-          // Пользователь уже существует - входим
-          if (onSuccess) {
-            onSuccess(userData);
-          }
-          return;
-        }
-      }
+      const result = await registerUser(registerData);
       
-      // Новый пользователь - регистрируем
-      if (onSuccess) {
-        onSuccess({
-          name: formData.name,
-          email: formData.email,
-          plan: selectedPlan || 'Starter'
+      if (result.success && result.user) {
+        // Сохраняем данные пользователя в localStorage для совместимости
+        localStorage.setItem('user', JSON.stringify({
+          name: result.user.name,
+          email: result.user.email,
+          plan: result.user.plan
+        }));
+        
+        onSuccess?.({
+          name: result.user.name,
+          email: result.user.email,
+          plan: result.user.plan
         });
       } else {
-        alert('Регистрация успешна! Проверьте email для подтверждения.');
+        setErrors({ general: result.error || 'Ошибка регистрации' });
       }
     } catch (error) {
-      setErrors({ general: 'Ошибка регистрации. Попробуйте снова.' });
+      console.error('Ошибка регистрации:', error);
+      setErrors({ general: 'Произошла ошибка при регистрации' });
     } finally {
       setLoading(false);
     }

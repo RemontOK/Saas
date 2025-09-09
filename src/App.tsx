@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import './App.css'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import { getCurrentUser, logoutUser, onAuthStateChange } from './services/auth'
+import { testSupabaseConnection } from './utils/test-supabase'
 
 // Популярные ниши для автокомплита
 const POPULAR_NICHES = [
@@ -1134,6 +1136,55 @@ export default function App() {
   const [err, setErr] = useState<string>('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Инициализация аутентификации
+  useEffect(() => {
+    // Тестируем подключение к Supabase
+    const testConnection = async () => {
+      const result = await testSupabaseConnection()
+      if (!result.success) {
+        console.error('Проблема с подключением к Supabase:', result.error)
+        alert('Ошибка подключения к базе данных. Проверьте консоль для подробностей.')
+      }
+    }
+
+    testConnection()
+
+    // Проверяем текущего пользователя при загрузке
+    const initAuth = async () => {
+      const currentUser = await getCurrentUser()
+      if (currentUser) {
+        setUser({
+          name: currentUser.name,
+          email: currentUser.email,
+          plan: currentUser.plan
+        })
+        setIsLoggedIn(true)
+      }
+    }
+
+    initAuth()
+
+    // Подписываемся на изменения аутентификации
+    const { data: { subscription } } = onAuthStateChange((user) => {
+      if (user) {
+        setUser({
+          name: user.name,
+          email: user.email,
+          plan: user.plan
+        })
+        setIsLoggedIn(true)
+      } else {
+        setUser(null)
+        setIsLoggedIn(false)
+        localStorage.removeItem('user')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+
   const openCheckout = (p: string) => { 
     setPlan(p); 
     setShowRegister(true) 
@@ -1162,11 +1213,19 @@ export default function App() {
     localStorage.setItem('user', JSON.stringify(userData))
   }
   
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    setUser(null)
-    // Удаляем данные из localStorage
-    localStorage.removeItem('user')
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+      setIsLoggedIn(false)
+      setUser(null)
+      localStorage.removeItem('user')
+    } catch (error) {
+      console.error('Ошибка выхода:', error)
+      // В любом случае очищаем локальное состояние
+      setIsLoggedIn(false)
+      setUser(null)
+      localStorage.removeItem('user')
+    }
   }
   
 
@@ -1486,32 +1545,123 @@ export default function App() {
                 🎯 Демо
               </a>
               
-              {/* Mobile CTA Button */}
-              <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>
-                <button style={{
-                  width: '100%',
-                  background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
-                  color: 'white',
-                  border: 'none',
+              {/* Mobile Auth Buttons */}
+              {isLoggedIn ? (
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '0.75rem',
+                  marginTop: '1rem',
                   padding: '1rem',
+                  background: 'rgba(14, 165, 233, 0.1)',
                   borderRadius: '12px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  marginTop: '0.5rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  border: '1px solid rgba(14, 165, 233, 0.2)'
                 }}>
-                  🚀 Начать зарабатывать
-                </button>
-              </a>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    color: '#e5e7eb',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.5rem'
+                  }}>
+                    <span>👋</span>
+                    <span>Привет, {user?.name}!</span>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      color: '#ef4444',
+                      border: '2px solid #ef4444',
+                      padding: '0.75rem',
+                      borderRadius: '8px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#ef4444';
+                      e.currentTarget.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = '#ef4444';
+                    }}
+                  >
+                    Выйти из аккаунта
+                  </button>
+                </div>
+              ) : (
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '0.75rem',
+                  marginTop: '1rem'
+                }}>
+                  <button 
+                    onClick={() => {
+                      openLogin();
+                      setMobileMenuOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      color: '#e5e7eb',
+                      border: '2px solid #e5e7eb',
+                      padding: '0.75rem',
+                      borderRadius: '8px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#e5e7eb';
+                      e.currentTarget.style.color = '#0f172a';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = '#e5e7eb';
+                    }}
+                  >
+                    🔑 Войти
+                  </button>
+                  <button 
+                    onClick={() => {
+                      openCheckout('Starter');
+                      setMobileMenuOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem',
+                      borderRadius: '8px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    🚀 Регистрация
+                  </button>
+                </div>
+              )}
             </nav>
           </div>
         )}

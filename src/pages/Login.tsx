@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { loginUser } from '../services/auth';
+import type { LoginData } from '../services/auth';
 
 interface LoginProps {
   onSuccess?: (userData: {name: string, email: string, plan: string}) => void;
@@ -19,7 +21,7 @@ export default function Login({ onSuccess, onSwitchToRegister }: LoginProps) {
     setLoading(true);
     setErrors({});
 
-    // Простая валидация
+    // Валидация
     const newErrors: Record<string, string> = {};
     
     if (!formData.email.trim()) newErrors.email = 'Введите email';
@@ -32,26 +34,32 @@ export default function Login({ onSuccess, onSwitchToRegister }: LoginProps) {
     }
 
     try {
-      // Имитация входа
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const loginData: LoginData = {
+        email: formData.email,
+        password: formData.password
+      };
       
-      // Проверяем, есть ли пользователь с таким email
-      const existingUser = localStorage.getItem('user');
-      if (existingUser) {
-        const userData = JSON.parse(existingUser);
-        if (userData.email === formData.email) {
-          // Пользователь найден - входим
-          if (onSuccess) {
-            onSuccess(userData);
-          }
-          return;
-        }
+      const result = await loginUser(loginData);
+      
+      if (result.success && result.user) {
+        // Сохраняем данные пользователя в localStorage для совместимости
+        localStorage.setItem('user', JSON.stringify({
+          name: result.user.name,
+          email: result.user.email,
+          plan: result.user.plan
+        }));
+        
+        onSuccess?.({
+          name: result.user.name,
+          email: result.user.email,
+          plan: result.user.plan
+        });
+      } else {
+        setErrors({ general: result.error || 'Ошибка входа' });
       }
-      
-      // Пользователь не найден
-      setErrors({ general: 'Пользователь с таким email не найден. Зарегистрируйтесь.' });
     } catch (error) {
-      setErrors({ general: 'Ошибка входа. Попробуйте снова.' });
+      console.error('Ошибка входа:', error);
+      setErrors({ general: 'Произошла ошибка при входе' });
     } finally {
       setLoading(false);
     }

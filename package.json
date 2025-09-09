@@ -14,6 +14,7 @@
     "deploy:auto": "git add . && git commit -m \"Auto deploy via GitHub Actions\" && git push origin main"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.11.0",
     "express": "^5.1.0",
