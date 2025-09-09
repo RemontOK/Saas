@@ -232,10 +232,15 @@ function Demo() {
       if (useMockData) {
         // Mock данные для GitHub Pages
         await new Promise(resolve => setTimeout(resolve, 1000)) // имитация задержки
-        const max = Math.min(Number(limit) || 20, 100)
+        const requestedCount = Math.min(Number(limit) || 20, 500)
         const now = Date.now()
         
-        const items = Array.from({ length: max }).map((_, i) => {
+        // Генерируем больше данных, чем нужно, чтобы после фильтрации получить точное количество
+        const items = []
+        let attempts = 0
+        const maxAttempts = requestedCount * 3 // Генерируем в 3 раза больше для фильтрации
+        
+        while (items.length < requestedCount && attempts < maxAttempts) {
           const reviews = Math.floor(Math.random() * 500)
           const rating = (Math.random() * 2 + 3).toFixed(1) // 3.0 - 5.0
           const openedAt = now - Math.floor(Math.random() * 400) * 24 * 3600 * 1000 // дни назад
@@ -249,7 +254,7 @@ function Demo() {
           
           // Реалистичные названия компаний
           const companyTemplates = COMPANY_TEMPLATES[nicheKey] || COMPANY_TEMPLATES['кофейни'];
-          const companyName = companyTemplates[i % companyTemplates.length] || `${niche} "${['Премиум', 'Элит', 'Профи', 'Мастер', 'Эксперт'][i % 5]}"`;
+          const companyName = companyTemplates[attempts % companyTemplates.length] || `${niche} "${['Премиум', 'Элит', 'Профи', 'Мастер', 'Эксперт'][attempts % 5]}"`;
           
           // Реалистичные домены
           const domainBase = companyName.toLowerCase()
@@ -276,8 +281,8 @@ function Demo() {
           const quality = Math.random()
           const tag = quality > 0.7 ? 'verified' : quality > 0.35 ? 'guessed' : 'unknown'
           
-          return {
-            id: i + 1,
+          const candidate = {
+            id: attempts + 1,
             company: companyName,
             location: location || 'Москва',
             website: `https://${domain}`,
@@ -291,12 +296,23 @@ function Demo() {
             source: 'demo',
             emailQuality: tag as 'verified' | 'guessed' | 'unknown'
           }
-        }).filter(r => r.reviews >= Number(minReviews))
-          .filter(r => !hasEmail || !!r.email)
-          .filter(r => !hasWebsite || !!r.website)
-          .filter(r => !hasTelegram || !!r.telegram)
-          .filter(r => !hasWhatsApp || !!r.whatsapp)
-          .filter(r => !recentOnly || (now - r.openedAt) < 365 * 24 * 3600 * 1000)
+          
+          // Проверяем, подходит ли кандидат под фильтры
+          const passesFilters = 
+            candidate.reviews >= Number(minReviews) &&
+            (!hasEmail || !!candidate.email) &&
+            (!hasWebsite || !!candidate.website) &&
+            (!hasTelegram || !!candidate.telegram) &&
+            (!hasWhatsApp || !!candidate.whatsapp) &&
+            (!recentOnly || (now - candidate.openedAt) < 365 * 24 * 3600 * 1000)
+          
+          if (passesFilters) {
+            candidate.id = items.length + 1 // Правильный ID
+            items.push(candidate)
+          }
+          
+          attempts++
+        }
         
         // Применяем сортировку
         switch (sortBy) {
