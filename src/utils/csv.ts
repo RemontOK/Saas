@@ -1,17 +1,18 @@
 import type { Lead } from '../types';
 
 export const exportToCsv = (leads: Lead[], filename: string = 'leads.csv') => {
-  const header = ['company','location','website','email','phone','emailQuality','rating','reviews','instagram'];
+  const header = ['company','location','website','email','phone','telegram','whatsapp','rating','reviews','emailQuality'];
   const rows = leads.map(l => [
     l.company, 
     l.location, 
     l.website, 
     l.email || '', 
     l.phone || '', 
-    l.emailQuality || '', 
+    l.telegram || '', 
+    l.whatsapp || '', 
     l.rating || '', 
     l.reviews || '', 
-    l.instagram || ''
+    l.emailQuality || ''
   ]);
   
   const csv = [header, ...rows].map(r => r.map(String).join(',')).join('\n');

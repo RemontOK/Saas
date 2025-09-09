@@ -8,7 +8,8 @@ export type Lead = {
   source?: string;
   rating?: number;
   reviews?: number;
-  instagram?: string;
+  telegram?: string;
+  whatsapp?: string;
   openedAt?: number;
   emailQuality?: 'verified' | 'guessed' | 'unknown';
 }

@@ -180,6 +180,13 @@
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s ease;
+  width: 100%;
+}
+
+.demo-input::placeholder {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
 .demo-input:focus {
@@ -255,4 +262,38 @@
   background: rgba(255, 255, 255, 0.1) !important;
   border-color: rgba(14, 165, 233, 0.3) !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Range slider styles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #0284c7;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
 }

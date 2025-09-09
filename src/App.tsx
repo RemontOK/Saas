@@ -1,6 +1,25 @@
 import { useMemo, useState } from 'react'
 import './App.css'
 
+// Популярные ниши для автокомплита
+const POPULAR_NICHES = [
+  'Кофейни и кафе', 'Стоматологии', 'Автосервисы', 'Салоны красоты', 'Фитнес-клубы',
+  'Рестораны', 'Парикмахерские', 'Юридические услуги', 'Медицинские центры', 'Автомойки',
+  'Строительные компании', 'Интернет-магазины', 'Агентства недвижимости', 'Турагентства', 'Банки',
+  'Страховые компании', 'IT-компании', 'Рекламные агентства', 'Детские сады', 'Школы',
+  'Ветеринарные клиники', 'Аптеки', 'Мебельные магазины', 'Автосалоны', 'Клининговые услуги'
+];
+
+// Популярные города России
+const POPULAR_CITIES = [
+  'Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург', 'Казань',
+  'Нижний Новгород', 'Челябинск', 'Самара', 'Омск', 'Ростов-на-Дону',
+  'Уфа', 'Красноярск', 'Воронеж', 'Пермь', 'Волгоград',
+  'Краснодар', 'Саратов', 'Тюмень', 'Тольятти', 'Ижевск',
+  'Барнаул', 'Ульяновск', 'Иркутск', 'Владивосток', 'Ярославль',
+  'Хабаровск', 'Махачкала', 'Томск', 'Оренбург', 'Кемерово'
+];
+
 // helper fade css
 const fadeStyles: React.CSSProperties = { animation: 'fadeUp .6s ease both' }
 
@@ -57,28 +76,119 @@ type Lead = {
   source?: string;
   rating?: number;
   reviews?: number;
-  instagram?: string;
+  telegram?: string;
+  whatsapp?: string;
   openedAt?: number;
   emailQuality?: 'verified' | 'guessed' | 'unknown';
 }
 
-function Tag({ label, tone = 'default' }: { label: string; tone?: 'default' | 'success' | 'warn' | 'muted' }) {
-  const colors = {
-    default: { bg: '#eef2f7', fg: '#0f172a' },
-    success: { bg: '#ecfdf5', fg: '#065f46' },
-    warn: { bg: '#fff7ed', fg: '#9a3412' },
-    muted: { bg: '#f1f5f9', fg: '#475569' },
-  }[tone]
-  return <span style={{ background: colors.bg, color: colors.fg, padding: '2px 8px', borderRadius: 999, fontSize: 12 }}>{label}</span>
+
+// Компонент автокомплита
+function AutocompleteInput({ 
+  value, 
+  onChange, 
+  placeholder, 
+  options, 
+  label 
+}: { 
+  value: string; 
+  onChange: (value: string) => void; 
+  placeholder: string; 
+  options: string[]; 
+  label: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredOptions, setFilteredOptions] = useState(options);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    onChange(inputValue);
+    
+    const filtered = options.filter(option => 
+      option.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    setFilteredOptions(filtered);
+    setIsOpen(inputValue.length > 0 && filtered.length > 0);
+  };
+
+  const handleOptionClick = (option: string) => {
+    onChange(option);
+    setIsOpen(false);
+  };
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label style={{ 
+        display: 'block', 
+        fontSize: '0.875rem', 
+        fontWeight: 600, 
+        color: '#374151', 
+        marginBottom: '0.5rem' 
+      }}>
+        {label}
+      </label>
+      <input
+        type="text"
+        value={value}
+        onChange={handleInputChange}
+        placeholder={placeholder}
+        className="demo-input"
+        onFocus={() => {
+          const filtered = options.filter(option => 
+            option.toLowerCase().includes(value.toLowerCase())
+          );
+          setFilteredOptions(filtered);
+          setIsOpen(value.length === 0 || filtered.length > 0);
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 150)}
+      />
+      {isOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          background: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          maxHeight: '200px',
+          overflowY: 'auto',
+          zIndex: 1000
+        }}>
+          {filteredOptions.slice(0, 8).map((option, index) => (
+            <div
+              key={index}
+              onClick={() => handleOptionClick(option)}
+              style={{
+                padding: '0.75rem 1rem',
+                cursor: 'pointer',
+                borderBottom: index < filteredOptions.length - 1 ? '1px solid #f3f4f6' : 'none',
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Demo() {
   const [niche, setNiche] = useState('')
   const [location, setLocation] = useState('')
   const [limit, setLimit] = useState<number>(50)
-  const [minReviews, setMinReviews] = useState<number>(50)
+  const [minReviews] = useState<number>(50)
   const [recentOnly, setRecentOnly] = useState<boolean>(false)
-  const [hasInstagram, setHasInstagram] = useState<boolean>(true)
+  const [hasTelegram, setHasTelegram] = useState<boolean>(false)
+  const [hasWhatsApp, setHasWhatsApp] = useState<boolean>(false)
+  const [hasWebsite, setHasWebsite] = useState<boolean>(true)
+  const [hasEmail, setHasEmail] = useState<boolean>(true)
+  const [sortBy, setSortBy] = useState<'none' | 'reviews_desc' | 'reviews_asc' | 'rating_desc' | 'rating_asc' | 'company_asc' | 'recent'>('none')
 
   const [stage, setStage] = useState<'idle' | 'search' | 'enrich' | 'done'>('idle')
   const [leads, setLeads] = useState<Lead[]>([])
@@ -103,7 +213,8 @@ function Demo() {
         const items = Array.from({ length: max }).map((_, i) => {
           const reviews = Math.floor(Math.random() * 500)
           const rating = (Math.random() * 2 + 3).toFixed(1) // 3.0 - 5.0
-          const ig = Math.random() > 0.5 ? `https://instagram.com/example_${i + 1}` : ''
+          const telegram = Math.random() > 0.6 ? `@company_${i + 1}` : ''
+          const whatsapp = Math.random() > 0.4 ? `+7-999-${String(i + 1).padStart(3, '0')}-${String(Math.floor(Math.random() * 100)).padStart(2, '0')}-${String(Math.floor(Math.random() * 100)).padStart(2, '0')}` : ''
           const openedAt = now - Math.floor(Math.random() * 400) * 24 * 3600 * 1000 // дни назад
           const domain = `example-${i + 1}.com`
           const quality = Math.random()
@@ -118,14 +229,43 @@ function Demo() {
             phone: '+1-555-0100',
             rating: Number(rating),
             reviews,
-            instagram: ig,
+            telegram: telegram,
+            whatsapp: whatsapp,
             openedAt,
             source: 'demo',
             emailQuality: tag as 'verified' | 'guessed' | 'unknown'
           }
         }).filter(r => r.reviews >= Number(minReviews))
-          .filter(r => !hasInstagram || !!r.instagram)
+          .filter(r => !hasEmail || !!r.email)
+          .filter(r => !hasWebsite || !!r.website)
+          .filter(r => !hasTelegram || !!r.telegram)
+          .filter(r => !hasWhatsApp || !!r.whatsapp)
           .filter(r => !recentOnly || (now - r.openedAt) < 365 * 24 * 3600 * 1000)
+        
+        // Применяем сортировку
+        switch (sortBy) {
+          case 'reviews_desc':
+            items.sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
+            break;
+          case 'reviews_asc':
+            items.sort((a, b) => (a.reviews || 0) - (b.reviews || 0));
+            break;
+          case 'rating_desc':
+            items.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            break;
+          case 'rating_asc':
+            items.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+            break;
+          case 'company_asc':
+            items.sort((a, b) => a.company.localeCompare(b.company));
+            break;
+          case 'recent':
+            items.sort((a, b) => (b.openedAt || 0) - (a.openedAt || 0));
+            break;
+          default:
+            // Без сортировки
+            break;
+        }
         
         setLeads(items)
         setStage('done')
@@ -134,7 +274,7 @@ function Demo() {
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ niche, location, limit, minReviews, recentOnly, hasInstagram })
+          body: JSON.stringify({ niche, location, limit, minReviews, recentOnly, hasEmail, hasWebsite, hasTelegram, hasWhatsApp, sortBy })
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
@@ -167,9 +307,9 @@ function Demo() {
   }
 
   const exportCsv = () => {
-    const header = ['company','location','website','email','phone','emailQuality','rating','reviews','instagram']
+    const header = ['company','location','website','email','phone','telegram','whatsapp','rating','reviews','emailQuality']
     const rows = leads.map(l => [
-      l.company, l.location, l.website, l.email || '', l.phone || '', l.emailQuality || '', l.rating || '', l.reviews || '', l.instagram || ''
+      l.company, l.location, l.website, l.email || '', l.phone || '', l.telegram || '', l.whatsapp || '', l.rating || '', l.reviews || '', l.emailQuality || ''
     ])
     const csv = [header, ...rows].map(r => r.map(String).join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -192,90 +332,368 @@ function Demo() {
             Попробуйте прямо сейчас! Введите нишу и локацию, чтобы увидеть как работает поиск лидов.
           </p>
         </div>
-        <form onSubmit={onSearch} className="demo-form">
-        <input placeholder="Ниша (напр. кофейни)" value={niche} onChange={e => setNiche(e.target.value)} className="demo-input" />
-        <input placeholder="Локация (напр. Москва)" value={location} onChange={e => setLocation(e.target.value)} className="demo-input" />
-        <input type="number" min={10} max={500} value={limit} onChange={e => setLimit(Number(e.target.value))} className="demo-input" placeholder="Лимит" />
-        <input type="number" min={0} max={5000} value={minReviews} onChange={e => setMinReviews(Number(e.target.value))} placeholder="Мин. отзывов" className="demo-input" />
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-          <input type="checkbox" checked={recentOnly} onChange={e => setRecentOnly(e.target.checked)} /> 
-          Новые (≤1 год)
-        </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-          <input type="checkbox" checked={hasInstagram} onChange={e => setHasInstagram(e.target.checked)} /> 
-          Есть Instagram
-        </label>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <button 
-            type="submit" 
-            disabled={!canSearch} 
-            className="primary-button"
-            style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
-          >
-            {stage === 'search' ? '🔍 Ищем...' : '🚀 Искать лиды'}
-          </button>
-          <button 
-            type="button" 
-            onClick={exportCsv} 
-            disabled={!leads.length} 
-            className="primary-button"
-            style={{ padding: '0.75rem 2rem', fontSize: '1rem', background: '#22c55e', borderColor: '#22c55e' }}
-          >
-            📊 Экспорт CSV
-          </button>
-          {stage !== 'idle' && (
-            <div style={{ 
-              padding: '0.5rem 1rem', 
-              background: '#f0f9ff', 
-              border: '1px solid #0ea5e9', 
-              borderRadius: '8px',
-              color: '#0ea5e9',
-              fontSize: '0.875rem'
-            }}>
-              Статус: {stage === 'search' ? '🔍 Сбор данных' : stage === 'enrich' ? '✨ Обогащение' : '✅ Готово'}
+        <form onSubmit={onSearch} style={{ 
+          background: 'white',
+          padding: '2rem',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb'
+        }}>
+          {/* Основные поля */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr', 
+            gap: '1.5rem',
+            marginBottom: '1.5rem'
+          }}>
+            <AutocompleteInput
+              value={niche}
+              onChange={setNiche}
+              placeholder="Например: кофейни, стоматологии, автосервисы..."
+              options={POPULAR_NICHES}
+              label="🎯 Ниша или тип бизнеса"
+            />
+            
+            <AutocompleteInput
+              value={location}
+              onChange={setLocation}
+              placeholder="Например: Москва, Санкт-Петербург..."
+              options={POPULAR_CITIES}
+              label="📍 Город или регион"
+            />
+          </div>
+
+          {/* Дополнительные параметры */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: '2rem',
+            marginBottom: '1.5rem'
+          }}>
+            {/* Ползунок для количества лидов */}
+            <div>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '0.875rem', 
+                fontWeight: 600, 
+                color: '#374151', 
+                marginBottom: '0.5rem' 
+              }}>
+                📊 Количество лидов: <span style={{ color: '#0ea5e9', fontWeight: 800 }}>{limit}</span>
+              </label>
+              <input 
+                type="range" 
+                min={10} 
+                max={500} 
+                value={limit} 
+                onChange={e => setLimit(Number(e.target.value))} 
+                style={{
+                  width: '100%',
+                  height: '6px',
+                  borderRadius: '3px',
+                  background: `linear-gradient(to right, #0ea5e9 0%, #0ea5e9 ${((limit - 10) / (500 - 10)) * 100}%, #e5e7eb ${((limit - 10) / (500 - 10)) * 100}%, #e5e7eb 100%)`,
+                  outline: 'none',
+                  appearance: 'none',
+                  cursor: 'pointer'
+                }}
+              />
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                fontSize: '0.75rem', 
+                color: '#6b7280', 
+                marginTop: '0.5rem' 
+              }}>
+                <span>10</span>
+                <span>500</span>
+              </div>
             </div>
-          )}
-          {error && (
-            <span style={{ color: '#ef4444', fontSize: '0.875rem', padding: '0.5rem' }}>
-              ❌ {error}
-            </span>
-          )}
+
+            {/* Сортировка */}
+            <div>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '0.875rem', 
+                fontWeight: 600, 
+                color: '#374151', 
+                marginBottom: '0.5rem' 
+              }}>
+                📋 Сортировка результатов
+              </label>
+              <select 
+                value={sortBy} 
+                onChange={e => setSortBy(e.target.value as any)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: '1rem',
+                  background: 'white',
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0ea5e9'}
+                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+              >
+                <option value="none">🎯 Без сортировки (как найдено)</option>
+                <option value="reviews_desc">⭐ Больше отзывов → меньше</option>
+                <option value="reviews_asc">⭐ Меньше отзывов → больше</option>
+                <option value="rating_desc">🏆 Лучший рейтинг → худший</option>
+                <option value="rating_asc">🏆 Худший рейтинг → лучший</option>
+                <option value="company_asc">🔤 По алфавиту (А → Я)</option>
+                <option value="recent">🆕 Сначала новые компании</option>
+              </select>
+              <div style={{ 
+                fontSize: '0.75rem', 
+                color: '#6b7280', 
+                marginTop: '0.25rem' 
+              }}>
+                Выберите порядок отображения лидов
+              </div>
+            </div>
+          </div>
+
+          {/* Фильтры каналов связи */}
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ 
+              display: 'block', 
+              fontSize: '0.875rem', 
+              fontWeight: 600, 
+              color: '#374151', 
+              marginBottom: '1rem' 
+            }}>
+              📱 Каналы связи (выберите нужные)
+            </label>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
+              gap: '1rem'
+            }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                padding: '0.75rem',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease',
+                background: hasEmail ? '#f0f9ff' : 'white'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={hasEmail} 
+                  onChange={e => setHasEmail(e.target.checked)}
+                /> 
+                📧 Email
+              </label>
+              
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                padding: '0.75rem',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease',
+                background: hasWebsite ? '#f0f9ff' : 'white'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={hasWebsite} 
+                  onChange={e => setHasWebsite(e.target.checked)}
+                /> 
+                🌐 Сайт
+              </label>
+              
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                padding: '0.75rem',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease',
+                background: hasTelegram ? '#f0f9ff' : 'white'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={hasTelegram} 
+                  onChange={e => setHasTelegram(e.target.checked)}
+                /> 
+                💬 Телеграм
+              </label>
+              
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                padding: '0.75rem',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease',
+                background: hasWhatsApp ? '#f0f9ff' : 'white'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={hasWhatsApp} 
+                  onChange={e => setHasWhatsApp(e.target.checked)}
+                /> 
+                📲 WhatsApp
+              </label>
+              
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                padding: '0.75rem',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease',
+                background: recentOnly ? '#f0f9ff' : 'white'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={recentOnly} 
+                  onChange={e => setRecentOnly(e.target.checked)}
+                /> 
+                🆕 Новые компании (≤1 год)
+              </label>
+            </div>
+          </div>
+
+          {/* Кнопки и статус */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '1rem', 
+            alignItems: 'center', 
+            flexWrap: 'wrap',
+            justifyContent: 'center'
+          }}>
+            <button 
+              type="submit" 
+              disabled={!canSearch} 
+              className="primary-button"
+              style={{ 
+                padding: '0.875rem 2.5rem', 
+                fontSize: '1rem',
+                minWidth: '160px',
+                borderRadius: '12px'
+              }}
+            >
+              {stage === 'search' ? '🔍 Ищем...' : '🚀 Искать лиды'}
+            </button>
+            
+            <button 
+              type="button" 
+              onClick={exportCsv} 
+              disabled={!leads.length} 
+              className="primary-button"
+              style={{ 
+                padding: '0.875rem 2.5rem', 
+                fontSize: '1rem', 
+                background: '#22c55e', 
+                borderColor: '#22c55e',
+                minWidth: '160px',
+                borderRadius: '12px'
+              }}
+            >
+              📊 Экспорт CSV
+            </button>
+          </div>
+
+          {/* Статус и ошибки */}
+          <div style={{ 
+            marginTop: '1.5rem',
+            textAlign: 'center'
+          }}>
+            {stage !== 'idle' && (
+              <div style={{ 
+                display: 'inline-block',
+                padding: '0.75rem 1.5rem', 
+                background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', 
+                border: '1px solid #0ea5e9', 
+                borderRadius: '12px',
+                color: '#0ea5e9',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                marginBottom: '1rem'
+              }}>
+                Статус: {stage === 'search' ? '🔍 Сбор данных' : stage === 'enrich' ? '✨ Обогащение' : '✅ Готово'}
+              </div>
+            )}
+            
+            {error && (
+              <div style={{ 
+                color: '#ef4444', 
+                fontSize: '0.875rem', 
+                padding: '0.75rem 1.5rem',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '12px',
+                fontWeight: 600
+              }}>
+                ❌ {error}
+              </div>
+            )}
         </div>
       </form>
       <div className="demo-table">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left border-b border-gray-200">Company</th>
-              <th className="text-left border-b border-gray-200">Location</th>
-              <th className="text-left border-b border-gray-200">Website</th>
-              <th className="text-left border-b border-gray-200">Instagram</th>
-              <th className="text-left border-b border-gray-200">Rating</th>
-              <th className="text-left border-b border-gray-200">Reviews</th>
+              <th className="text-left border-b border-gray-200">Компания</th>
+              <th className="text-left border-b border-gray-200">Город</th>
+              <th className="text-left border-b border-gray-200">Сайт</th>
               <th className="text-left border-b border-gray-200">Email</th>
-              <th className="text-left border-b border-gray-200">Phone</th>
-              <th className="text-left border-b border-gray-200">Quality</th>
+              <th className="text-left border-b border-gray-200">Телефон</th>
+              <th className="text-left border-b border-gray-200">Телеграм</th>
+              <th className="text-left border-b border-gray-200">WhatsApp</th>
+              <th className="text-left border-b border-gray-200">Рейтинг</th>
+              <th className="text-left border-b border-gray-200">Отзывы</th>
             </tr>
           </thead>
           <tbody>
             {leads.map((l) => (
               <tr key={l.id}>
-                <td className="border-b border-gray-100">{l.company}</td>
+                <td className="border-b border-gray-100" style={{ fontWeight: 600 }}>{l.company}</td>
                 <td className="border-b border-gray-100">{l.location}</td>
                 <td className="border-b border-gray-100">
-                  <a href={l.website} target="_blank" rel="noreferrer">{l.website}</a>
+                  <a href={l.website} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9' }}>
+                    🌐 Сайт
+                  </a>
+                </td>
+                <td className="border-b border-gray-100">{l.email || '—'}</td>
+                <td className="border-b border-gray-100">{l.phone || '—'}</td>
+                <td className="border-b border-gray-100">
+                  {l.telegram ? (
+                    <span style={{ color: '#0088cc', fontWeight: 500 }}>💬 {l.telegram}</span>
+                  ) : (
+                    <span style={{ color: '#9ca3af' }}>—</span>
+                  )}
                 </td>
                 <td className="border-b border-gray-100">
-                  {l.instagram ? <a href={l.instagram} target="_blank" rel="noreferrer">Instagram</a> : <span className="text-gray-500">—</span>}
+                  {l.whatsapp ? (
+                    <span style={{ color: '#25d366', fontWeight: 500 }}>📲 {l.whatsapp}</span>
+                  ) : (
+                    <span style={{ color: '#9ca3af' }}>—</span>
+                  )}
                 </td>
-                <td className="border-b border-gray-100">{l.rating ?? '—'}</td>
-                <td className="border-b border-gray-100">{l.reviews ?? '—'}</td>
-                <td className="border-b border-gray-100">{l.email || '-'}</td>
-                <td className="border-b border-gray-100">{l.phone || '-'}</td>
                 <td className="border-b border-gray-100">
-                  {l.emailQuality === 'verified' && <Tag label="verified" tone="success" />}
-                  {l.emailQuality === 'guessed' && <Tag label="guessed" tone="warn" />}
-                  {!l.emailQuality && <Tag label="unknown" tone="muted" />}
+                  <span style={{ color: '#f59e0b', fontWeight: 600 }}>⭐ {l.rating ?? '—'}</span>
+                </td>
+                <td className="border-b border-gray-100">
+                  <span style={{ color: '#6b7280' }}>{l.reviews ?? '—'}</span>
                 </td>
               </tr>
             ))}
@@ -522,16 +940,16 @@ export default function App() {
             <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
               Каждая функция создана для увеличения ваших продаж и снижения затрат на привлечение клиентов
             </p>
-          </div>
+            </div>
           <div className="feature-grid">
             <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
               <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)' }}>
                 🎯
-              </div>
+            </div>
               <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem' }}>Лиды «под сделку»</div>
               <div style={{ color: '#475569', lineHeight: 1.6 }}>
                 Релевантные компании и лица, принимающие решения — меньше холостых звонков, больше встреч.
-              </div>
+            </div>
             </div>
             <div className="feature-card" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
               <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
@@ -598,7 +1016,7 @@ export default function App() {
             <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
               От поиска до первых звонков — всего несколько минут
             </p>
-          </div>
+            </div>
           <div style={{ 
             display: 'grid', 
             gap: '2rem', 
@@ -626,7 +1044,7 @@ export default function App() {
                 margin: '0 auto 1.5rem'
               }}>
                 🎯
-              </div>
+            </div>
               <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '1rem', color: 'white' }}>
                 1. Укажите нишу и локацию
               </div>
@@ -705,21 +1123,24 @@ export default function App() {
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>
-              Тарифы — окупаются с 1 сделки
+              Честные тарифы — платите только за результат
             </h2>
             <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>
-              Выберите план, который подходит для ваших целей. Все тарифы включают базовый функционал.
+              Базовая подписка + доплата только за дополнительные лиды. Никаких скрытых комиссий.
             </p>
           </div>
           <div className="pricing-grid">
             <div className="pricing-card">
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Starter</div>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '1.5rem' }}>
-                ₽1,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '0.5rem' }}>
+                ₽990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                + 2₽ за лид сверх лимита
               </div>
               <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> До 300 лидов
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> 200 лидов включено
                 </li>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
                   <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Базовое обогащение
@@ -732,21 +1153,24 @@ export default function App() {
                 </li>
               </ul>
               <button onClick={() => openCheckout('Starter')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
-                Начать зарабатывать
+                Начать за ₽990
               </button>
               <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#64748b' }}>
-                Окупаемость с 1–2 сделок
+                Идеально для старта
               </div>
             </div>
 
             <div className="pricing-card popular">
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Pro</div>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '1.5rem' }}>
-                ₽4,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '0.5rem' }}>
+                ₽2,490<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                + 1.5₽ за лид сверх лимита
               </div>
               <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> До 1,500 лидов
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> 500 лидов включено
                 </li>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
                   <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Верификация email
@@ -757,39 +1181,48 @@ export default function App() {
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
                   <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Расширенные фильтры
                 </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> API доступ
+                </li>
               </ul>
               <button onClick={() => openCheckout('Pro')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
-                Начать зарабатывать
+                Выбрать Pro
               </button>
               <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#64748b' }}>
-                Самый популярный выбор
+                🔥 Самый популярный выбор
               </div>
             </div>
 
             <div className="pricing-card">
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Agency</div>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '1.5rem' }}>
-                ₽12,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Enterprise</div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0ea5e9', marginBottom: '0.5rem' }}>
+                ₽7,990<span style={{ fontSize: '1rem', color: '#64748b' }}>/мес</span>
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                + 1₽ за лид сверх лимита
               </div>
               <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> До 6,000 лидов
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> 2,000 лидов включено
                 </li>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> API и интеграции
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Полное API
                 </li>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Персональное сопровождение
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Персональный менеджер
                 </li>
                 <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
                   <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> Белый лейбл
                 </li>
+                <li style={{ padding: '0.5rem 0', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#22c55e', marginRight: '0.5rem' }}>✓</span> SLA 99.9%
+                </li>
               </ul>
-              <button onClick={() => openCheckout('Agency')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
-                Начать зарабатывать
+              <button onClick={() => openCheckout('Enterprise')} className="primary-button" style={{ width: '100%', padding: '1rem' }}>
+                Связаться с нами
               </button>
               <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#64748b' }}>
-                Для агентств и больших команд
+                Для агентств и корпораций
               </div>
             </div>
           </div>
