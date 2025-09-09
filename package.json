@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "dev:all": "concurrently \"npm:server\" \"npm:dev\"",
-    "deploy": "npm run build && git add dist && git commit -m \"Update build\" && git push origin main"
+    "deploy": "git add . && git commit -m \"Deploy: update project\" && git push origin main"
   },
   "dependencies": {
     "axios": "^1.11.0",
