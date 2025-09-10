@@ -147,31 +147,20 @@ export const registerUser = async (data: RegisterData): Promise<AuthResponse> =>
       }
     }, 2000) // Проверяем через 2 секунды
 
-    // Автоматически входим пользователя после регистрации
-    const loginResult = await loginUser({
+    // Регистрация прошла успешно, возвращаем данные пользователя
+    console.log('✅ Регистрация пользователя завершена успешно')
+    
+    const user: User = {
+      id: authData.user.id,
       email: data.email,
-      password: data.password
-    })
-
-    if (loginResult.success && loginResult.user) {
-      console.log('✅ Пользователь автоматически вошел в систему после регистрации')
-      return { success: true, user: loginResult.user }
-    } else {
-      console.warn('⚠️ Регистрация прошла успешно, но автоматический вход не удался')
-      
-      // Возвращаем данные пользователя даже если вход не удался
-      const user: User = {
-        id: authData.user.id,
-        email: data.email,
-        name: data.name,
-        company: data.company,
-        phone: data.phone,
-        plan: data.plan,
-        created_at: new Date().toISOString()
-      }
-
-      return { success: true, user }
+      name: data.name,
+      company: data.company,
+      phone: data.phone,
+      plan: data.plan,
+      created_at: new Date().toISOString()
     }
+    
+    return { success: true, user }
   } catch (error) {
     console.error('Ошибка регистрации:', error)
     return { success: false, error: 'Произошла ошибка при регистрации' }
@@ -194,17 +183,11 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
     
     console.log('📤 Отправляем запрос входа в Supabase...')
     
-    // Добавляем таймаут для входа
-    const loginPromise = supabase.auth.signInWithPassword({
+    // Простой запрос входа без таймаута
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password
     })
-    
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Таймаут входа в систему')), 10000)
-    )
-    
-    const { data: authData, error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any
 
     console.log('📊 Результат аутентификации:', { 
       hasUser: !!authData.user, 
@@ -291,13 +274,6 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
     return { success: true, user: user || undefined }
   } catch (error: any) {
     console.error('💥 Критическая ошибка входа:', error)
-    
-    // Если таймаут - возвращаем специальную ошибку
-    if (error.message === 'Таймаут входа в систему') {
-      console.log('⏰ Таймаут входа в систему')
-      return { success: false, error: 'Вход занял слишком много времени. Попробуйте еще раз.' }
-    }
-    
     return { success: false, error: 'Произошла ошибка при входе' }
   }
 }
