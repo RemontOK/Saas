@@ -1197,6 +1197,11 @@ export default function App() {
     setShowRegister(false)
     setShowLogin(false)
     localStorage.setItem('user', JSON.stringify(userData))
+    
+    // Небольшая задержка для обновления состояния
+    setTimeout(() => {
+      console.log('Auth success - state updated:', { isLoggedIn, user: userData })
+    }, 100)
   }
   
 
@@ -1248,12 +1253,15 @@ export default function App() {
 
   // Если пользователь авторизован, показываем Dashboard
   if (isLoggedIn && user) {
+    console.log('Rendering Dashboard for user:', user)
     return (
       <div className="App">
         <Dashboard user={user} onLogout={handleLogout} />
       </div>
     )
   }
+  
+  console.log('Not rendering Dashboard. State:', { isLoggedIn, hasUser: !!user })
 
   return (
     <div>
@@ -1390,6 +1398,7 @@ export default function App() {
                 Войти
               </button>
             )}
+            
             <a href="#pricing">
               <button style={{
                 background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',

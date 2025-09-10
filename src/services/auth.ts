@@ -101,10 +101,27 @@ export const registerUser = async (data: RegisterData): Promise<AuthResponse> =>
 // Вход пользователя
 export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
   try {
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    console.log('🔑 auth.ts: Начинаем вход для:', data.email);
+    
+    console.log('📤 auth.ts: Отправляем запрос в Supabase...');
+    
+    // Добавляем таймаут для запроса
+    const loginPromise = supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password
-    })
+    });
+    
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Таймаут входа')), 10000)
+    );
+    
+    const { data: authData, error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
+    
+    console.log('📊 auth.ts: Результат от Supabase:', { 
+      hasUser: !!authData?.user, 
+      hasError: !!authError,
+      errorMessage: authError?.message 
+    });
 
     if (authError) {
       // Обрабатываем специфичные ошибки Supabase
@@ -170,8 +187,15 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
       }
     }
 
+    console.log('✅ auth.ts: Вход завершен успешно, возвращаем пользователя:', user?.email);
     return { success: true, user: user || undefined }
   } catch (error: any) {
+    console.error('💥 auth.ts: Критическая ошибка входа:', error);
+    
+    if (error.message === 'Таймаут входа') {
+      return { success: false, error: 'Вход занял слишком много времени. Проверьте подключение к интернету.' }
+    }
+    
     return { success: false, error: 'Произошла ошибка при входе' }
   }
 }
