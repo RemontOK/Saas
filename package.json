@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "dev:all": "concurrently \"npm:server\" \"npm:dev\"",
+    "setup-env": "node setup-env.cjs",
     "deploy": "npm run build && git add . && git commit -m \"Deploy: update project\" && git push origin main",
     "deploy:auto": "git add . && git commit -m \"Auto deploy via GitHub Actions\" && git push origin main"
   },

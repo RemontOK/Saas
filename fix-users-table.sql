@@ -1,9 +1,12 @@
--- Создание таблицы users в Supabase
--- Выполните этот SQL в SQL Editor в Supabase Dashboard
+-- ИСПРАВЛЕНИЕ ТАБЛИЦЫ USERS
+-- Выполните этот SQL в Supabase Dashboard → SQL Editor
 
--- Создаем таблицу users
-CREATE TABLE IF NOT EXISTS users (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+-- 1. Удаляем существующую таблицу users (если есть)
+DROP TABLE IF EXISTS users CASCADE;
+
+-- 2. Создаем таблицу users БЕЗ foreign key constraint
+CREATE TABLE users (
+  id UUID PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   company TEXT,
@@ -13,10 +16,10 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Включаем Row Level Security (RLS)
+-- 3. Включаем Row Level Security (RLS)
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- Создаем политики безопасности
+-- 4. Создаем политики безопасности
 -- Пользователи могут видеть только свои данные
 CREATE POLICY "Users can view own profile" ON users
   FOR SELECT USING (auth.uid() = id);
@@ -29,11 +32,7 @@ CREATE POLICY "Users can update own profile" ON users
 CREATE POLICY "Users can insert own profile" ON users
   FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Временно отключаем RLS для создания записей (для отладки)
--- ВНИМАНИЕ: Это только для разработки! В продакшене нужно настроить правильные политики
-ALTER TABLE users DISABLE ROW LEVEL SECURITY;
-
--- Создаем функцию для автоматического обновления updated_at
+-- 5. Создаем функцию для автоматического обновления updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -42,13 +41,13 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Создаем триггер для автоматического обновления updated_at
+-- 6. Создаем триггер для автоматического обновления updated_at
 CREATE TRIGGER update_users_updated_at
   BEFORE UPDATE ON users
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Создаем функцию для автоматического создания записи пользователя при регистрации
+-- 7. Создаем функцию для автоматического создания записи пользователя
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -65,7 +64,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Создаем триггер для автоматического создания записи пользователя
+-- 8. Создаем триггер для автоматического создания записи пользователя
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 9. Даем права на выполнение функции
+GRANT USAGE ON SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT ALL ON public.users TO postgres, anon, authenticated, service_role;
+GRANT ALL ON public.handle_new_user TO postgres, anon, authenticated, service_role;
+
+-- 10. Проверяем результат
+SELECT 'Таблица users создана успешно!' as status;

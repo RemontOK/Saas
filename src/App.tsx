@@ -3,8 +3,7 @@ import './App.css'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-import { getCurrentUser, logoutUser, onAuthStateChange } from './services/auth'
-import { testSupabaseConnection } from './utils/test-supabase'
+import { getCurrentUser, onAuthStateChange } from './services/auth'
 
 // Популярные ниши для автокомплита
 const POPULAR_NICHES = [
@@ -1138,20 +1137,10 @@ export default function App() {
 
   // Инициализация аутентификации
   useEffect(() => {
-    // Тестируем подключение к Supabase
-    const testConnection = async () => {
-      const result = await testSupabaseConnection()
-      if (!result.success) {
-        console.error('Проблема с подключением к Supabase:', result.error)
-        alert('Ошибка подключения к базе данных. Проверьте консоль для подробностей.')
-      }
-    }
-
-    testConnection()
-
     // Проверяем текущего пользователя при загрузке
     const initAuth = async () => {
       const currentUser = await getCurrentUser()
+      
       if (currentUser) {
         setUser({
           name: currentUser.name,
@@ -1174,9 +1163,7 @@ export default function App() {
         })
         setIsLoggedIn(true)
       } else {
-        setUser(null)
-        setIsLoggedIn(false)
-        localStorage.removeItem('user')
+        resetToMainPage()
       }
     })
 
@@ -1209,23 +1196,25 @@ export default function App() {
     setIsLoggedIn(true)
     setShowRegister(false)
     setShowLogin(false)
-    // Сохраняем данные в localStorage
     localStorage.setItem('user', JSON.stringify(userData))
   }
   
-  const handleLogout = async () => {
-    try {
-      await logoutUser()
-      setIsLoggedIn(false)
-      setUser(null)
-      localStorage.removeItem('user')
-    } catch (error) {
-      console.error('Ошибка выхода:', error)
-      // В любом случае очищаем локальное состояние
-      setIsLoggedIn(false)
-      setUser(null)
-      localStorage.removeItem('user')
-    }
+
+  // Сброс всех состояний и возврат на главную
+  const resetToMainPage = () => {
+    setShowRegister(false)
+    setShowLogin(false)
+    setShowCheckout(false)
+    setIsLoggedIn(false)
+    setUser(null)
+    localStorage.removeItem('user')
+  }
+
+
+  const handleLogout = () => {
+    // Простой выход без проверок
+    resetToMainPage()
+    alert('Вы вышли из системы')
   }
   
 
@@ -1345,33 +1334,35 @@ export default function App() {
                 gap: '1rem',
                 color: '#e5e7eb'
               }}>
-                <span style={{ fontSize: '0.9rem' }}>
-                  👋 Привет, {user?.name}!
-                </span>
-                <button 
-                  onClick={handleLogout}
-                  style={{
-                    background: 'transparent',
-                    color: '#ef4444',
-                    border: '2px solid #ef4444',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '6px',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#ef4444';
-                    e.currentTarget.style.color = 'white';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#ef4444';
-                  }}
-                >
-                  Выйти
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <span style={{ fontSize: '0.9rem' }}>
+                    👋 Привет, {user?.name}!
+                  </span>
+                  <button 
+                    onClick={handleLogout}
+                    style={{
+                      background: 'transparent',
+                      color: '#ef4444',
+                      border: '2px solid #ef4444',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '6px',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#ef4444';
+                      e.currentTarget.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = '#ef4444';
+                    }}
+                  >
+                    Выйти
+                  </button>
+                </div>
               </div>
             ) : (
               <button 
@@ -2517,6 +2508,7 @@ export default function App() {
           </button>
         </div>
       )}
+
     </div>
   )
 }
