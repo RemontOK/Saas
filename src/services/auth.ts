@@ -105,17 +105,11 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
     
     console.log('📤 auth.ts: Отправляем запрос в Supabase...');
     
-    // Добавляем таймаут для запроса
-    const loginPromise = supabase.auth.signInWithPassword({
+    // Прямой запрос без таймаута
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password
     });
-    
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Таймаут входа')), 10000)
-    );
-    
-    const { data: authData, error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
     
     console.log('📊 auth.ts: Результат от Supabase:', { 
       hasUser: !!authData?.user, 
@@ -191,11 +185,7 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
     return { success: true, user: user || undefined }
   } catch (error: any) {
     console.error('💥 auth.ts: Критическая ошибка входа:', error);
-    
-    if (error.message === 'Таймаут входа') {
-      return { success: false, error: 'Вход занял слишком много времени. Проверьте подключение к интернету.' }
-    }
-    
+
     return { success: false, error: 'Произошла ошибка при входе' }
   }
 }
@@ -209,13 +199,8 @@ export const logoutUser = async (): Promise<{ success: boolean; error?: string }
     const { data: { user } } = await supabase.auth.getUser()
     console.log('👤 Текущий пользователь перед выходом:', user ? user.email : 'Нет пользователя')
     
-    // Добавляем таймаут для signOut
-    const signOutPromise = supabase.auth.signOut()
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Таймаут выхода из системы')), 5000)
-    )
-    
-    const { error } = await Promise.race([signOutPromise, timeoutPromise]) as any
+    // Прямой выход без таймаута
+    const { error } = await supabase.auth.signOut()
     
     if (error) {
       console.error('❌ Ошибка выхода:', error)
@@ -230,13 +215,7 @@ export const logoutUser = async (): Promise<{ success: boolean; error?: string }
     return { success: true }
   } catch (error: any) {
     console.error('💥 Критическая ошибка выхода:', error)
-    
-    // Если таймаут - все равно считаем успешным, так как состояние очистится
-    if (error.message === 'Таймаут выхода из системы') {
-      console.log('⏰ Таймаут выхода, но продолжаем очистку состояния')
-      return { success: true, error: 'Таймаут, но состояние будет очищено' }
-    }
-    
+
     return { success: false, error: error.message || 'Неизвестная ошибка выхода' }
   }
 }
