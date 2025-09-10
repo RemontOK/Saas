@@ -34,21 +34,14 @@ export default function Login({ onSuccess, onSwitchToRegister }: LoginProps) {
     }
 
     try {
-      console.log('🔑 Login: Начинаем процесс входа для:', formData.email);
-      
       const loginData: LoginData = {
         email: formData.email,
         password: formData.password
       };
       
-      console.log('📤 Login: Отправляем данные в loginUser');
       const result = await loginUser(loginData);
       
-      console.log('📥 Login: Получен результат от loginUser:', result);
-      
       if (result.success && result.user) {
-        console.log('✅ Login: Вход успешен, сохраняем данные пользователя');
-        
         // Сохраняем данные пользователя в localStorage для совместимости
         const userData = {
           name: result.user.name,
@@ -57,21 +50,13 @@ export default function Login({ onSuccess, onSwitchToRegister }: LoginProps) {
         };
         
         localStorage.setItem('user', JSON.stringify(userData));
-        console.log('💾 Login: Данные сохранены в localStorage:', userData);
-        
-        console.log('📞 Login: Вызываем onSuccess callback');
         onSuccess?.(userData);
-        
-        console.log('🎉 Login: Процесс входа завершен успешно');
       } else {
-        console.error('❌ Login: Ошибка входа:', result.error);
         setErrors({ general: result.error || 'Ошибка входа' });
       }
     } catch (error) {
-      console.error('💥 Login: Критическая ошибка входа:', error);
       setErrors({ general: 'Произошла ошибка при входе' });
     } finally {
-      console.log('🏁 Login: Завершение процесса входа, сброс загрузки');
       setLoading(false);
     }
   };

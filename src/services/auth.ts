@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase'
 import type { User } from '../lib/supabase'
-import { createUserRecord, checkUserExists } from '../utils/create-user-record'
 
 export interface RegisterData {
   name: string
@@ -25,8 +24,6 @@ export interface AuthResponse {
 // Регистрация пользователя
 export const registerUser = async (data: RegisterData): Promise<AuthResponse> => {
   try {
-    console.log('Начинаем регистрацию пользователя:', data.email)
-    
     // Регистрируем пользователя в Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: data.email,
@@ -41,11 +38,7 @@ export const registerUser = async (data: RegisterData): Promise<AuthResponse> =>
       }
     })
 
-    console.log('Результат регистрации:', { authData, authError })
-
     if (authError) {
-      console.error('Ошибка регистрации:', authError)
-      
       // Обрабатываем специфичные ошибки Supabase
       if (authError.message.includes('already registered') || 
           authError.message.includes('User already registered') ||
@@ -71,9 +64,8 @@ export const registerUser = async (data: RegisterData): Promise<AuthResponse> =>
     }
 
     // Пытаемся создать запись в таблице users
-    // Если не получается, полагаемся на триггер handle_new_user
     try {
-      const { error: userError } = await supabase
+      await supabase
         .from('users')
         .insert([
           {
@@ -85,70 +77,9 @@ export const registerUser = async (data: RegisterData): Promise<AuthResponse> =>
             plan: data.plan
           }
         ])
-
-      if (userError) {
-        console.warn('Не удалось создать запись в таблице users:', userError.message)
-        console.log('Полагаемся на триггер handle_new_user для автоматического создания записи')
-      } else {
-        console.log('Запись пользователя успешно создана в таблице users')
-      }
     } catch (error) {
-      console.warn('Ошибка при создании записи пользователя:', error)
-      console.log('Полагаемся на триггер handle_new_user для автоматического создания записи')
+      // Игнорируем ошибки - полагаемся на триггер
     }
-
-    // Проверяем, создалась ли запись в таблице users через триггер
-    setTimeout(async () => {
-      try {
-        const { exists } = await checkUserExists(authData.user.id)
-        
-        if (exists) {
-          console.log('✅ Запись пользователя успешно создана через триггер handle_new_user')
-        } else {
-          console.log('⚠️ Запись пользователя не найдена в таблице users, создаем через fallback...')
-          
-          // Создаем запись через fallback функцию
-          const result = await createUserRecord({
-            id: authData.user.id,
-            email: data.email,
-            name: data.name,
-            company: data.company,
-            phone: data.phone,
-            plan: data.plan
-          })
-          
-          if (result.success) {
-            console.log('✅ Запись пользователя создана через fallback функцию')
-          } else if (result.retry) {
-            console.log('⏳ Пользователь еще не создан в auth.users, ждем еще...')
-            // Повторяем попытку через 3 секунды
-            setTimeout(async () => {
-              const retryResult = await createUserRecord({
-                id: authData.user.id,
-                email: data.email,
-                name: data.name,
-                company: data.company,
-                phone: data.phone,
-                plan: data.plan
-              })
-              
-              if (retryResult.success) {
-                console.log('✅ Запись пользователя создана при повторной попытке')
-              } else {
-                console.error('❌ Не удалось создать запись пользователя даже при повторной попытке:', retryResult.error)
-              }
-            }, 3000)
-          } else {
-            console.error('❌ Не удалось создать запись пользователя:', result.error)
-          }
-        }
-      } catch (error) {
-        console.log('⚠️ Не удалось проверить создание записи пользователя:', error)
-      }
-    }, 2000) // Проверяем через 2 секунды
-
-    // Регистрация прошла успешно, возвращаем данные пользователя
-    console.log('✅ Регистрация пользователя завершена успешно')
     
     const user: User = {
       id: authData.user.id,
@@ -170,41 +101,16 @@ export const registerUser = async (data: RegisterData): Promise<AuthResponse> =>
 // Вход пользователя
 export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
   try {
-    console.log('🔑 Начинаем вход пользователя:', data.email)
-    
-    // Сначала тестируем подключение к Supabase
-    console.log('🔍 Тестируем подключение к Supabase...')
-    try {
-      const { data: testData, error: testError } = await supabase.auth.getUser()
-      console.log('📊 Тест подключения:', { hasData: !!testData, hasError: !!testError, error: testError?.message })
-    } catch (testErr) {
-      console.error('❌ Ошибка тестирования подключения:', testErr)
-    }
-    
-    console.log('📤 Отправляем запрос входа в Supabase...')
-    
-    // Простой запрос входа без таймаута
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password
     })
 
-    console.log('📊 Результат аутентификации:', { 
-      hasUser: !!authData.user, 
-      hasError: !!authError,
-      errorMessage: authError?.message,
-      userId: authData.user?.id,
-      userEmail: authData.user?.email
-    })
-
     if (authError) {
-      console.error('❌ Ошибка входа:', authError)
-      
       // Обрабатываем специфичные ошибки Supabase
       if (authError.message.includes('Invalid login credentials') ||
           authError.message.includes('Invalid email or password') ||
           authError.message.includes('Invalid credentials') ||
-          authError.message.includes('Email not confirmed') ||
           authError.message.includes('User not found')) {
         return { success: false, error: 'Неверный логин или пароль' }
       }
@@ -222,12 +128,9 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
     }
 
     if (!authData.user) {
-      console.error('❌ Пользователь не найден в ответе аутентификации')
       return { success: false, error: 'Ошибка входа' }
     }
 
-    console.log('✅ Аутентификация прошла успешно, получаем данные пользователя')
-    
     // Получаем данные пользователя из таблицы users
     let user: User | null = null
     
@@ -239,10 +142,8 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
         .single()
 
       if (userData && !userError) {
-        console.log('✅ Данные пользователя получены из таблицы users')
         user = userData
       } else {
-        console.log('⚠️ Запись в таблице users не найдена, используем user_metadata')
         // Если нет записи в таблице users, создаем из user_metadata
         const metadata = authData.user.user_metadata
         user = {
@@ -256,7 +157,6 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
         }
       }
     } catch (error) {
-      console.warn('Ошибка получения данных пользователя:', error)
       // Fallback на user_metadata
       const metadata = authData.user.user_metadata
       user = {
@@ -270,10 +170,8 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
       }
     }
 
-    console.log('🎉 Вход пользователя завершен успешно:', user?.email)
     return { success: true, user: user || undefined }
   } catch (error: any) {
-    console.error('💥 Критическая ошибка входа:', error)
     return { success: false, error: 'Произошла ошибка при входе' }
   }
 }

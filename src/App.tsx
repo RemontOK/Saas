@@ -3,7 +3,6 @@ import './App.css'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-import DebugAuth from './pages/DebugAuth'
 import { getCurrentUser, onAuthStateChange } from './services/auth'
 
 // Популярные ниши для автокомплита
@@ -1118,7 +1117,6 @@ export default function App() {
   const [showCheckout, setShowCheckout] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
-  const [showDebugAuth, setShowDebugAuth] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     // Проверяем localStorage при загрузке
     const savedUser = localStorage.getItem('user')
@@ -1392,31 +1390,6 @@ export default function App() {
                 Войти
               </button>
             )}
-            <button 
-              onClick={() => setShowDebugAuth(true)}
-              style={{
-                background: 'transparent',
-                color: '#f59e0b',
-                border: '2px solid #f59e0b',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                marginLeft: '0.5rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f59e0b';
-                e.currentTarget.style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#f59e0b';
-              }}
-            >
-              🔧 Диагностика
-            </button>
             <a href="#pricing">
               <button style={{
                 background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
@@ -2536,34 +2509,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Debug Auth Page */}
-      {showDebugAuth && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0, 0, 0, 0.8)' }}>
-          <DebugAuth />
-          <button 
-            onClick={() => setShowDebugAuth(false)}
-            style={{
-              position: 'absolute',
-              top: '2rem',
-              right: '2rem',
-              background: 'rgba(255, 255, 255, 0.9)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '3rem',
-              height: '3rem',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              zIndex: 10000
-            }}
-          >
-            ✕
-          </button>
-        </div>
-      )}
 
     </div>
   )
